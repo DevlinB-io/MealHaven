@@ -5,12 +5,12 @@ session_start();
 // check if logged in
 if (isset($_SESSION['user_id'])) {
     // connect to database
-    require_once 'db_connect.php';
+    require_once '../DATABASE/database_connection.php';
 
     // get user id
     $userId = $_SESSION['user_id'];
     // prepare query
-    $stmt = $conn->prepare("SELECT user_first_name, user_last_name FROM users WHERE user_id = ?");
+    $stmt = $database_connection->prepare("SELECT USER_FIRST_NAME, USER_LAST_NAME FROM USER WHERE USER_ID = ?");
     // bind user id
     $stmt->bind_param("i", $userId);
     // run query
@@ -25,9 +25,9 @@ if (isset($_SESSION['user_id'])) {
         // send user info as json
         echo json_encode([
             'loggedIn' => true,
-            'firstName' => $user['user_first_name'],
-            'lastName' => $user['user_last_name'],
-            'initials' => strtoupper(substr($user['user_first_name'], 0, 1) . substr($user['user_last_name'], 0, 1))
+            'firstName' => $user['USER_FIRST_NAME'],
+            'lastName' => $user['USER_LAST_NAME'],
+            'initials' => strtoupper(substr($user['USER_FIRST_NAME'], 0, 1) . substr($user['USER_LAST_NAME'], 0, 1))
         ]);
     } else {
         // user not found
@@ -37,7 +37,7 @@ if (isset($_SESSION['user_id'])) {
     // close statement
     $stmt->close();
     // close connection
-    $conn->close();
+    $database_connection->close();
 } else {
     // not logged in
     echo json_encode(['loggedIn' => false]);

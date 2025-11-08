@@ -1,6 +1,6 @@
 <?php
 // connect to database
-require_once 'db_connect.php';
+require_once '../DATABASE/database_connection.php';
 
 // check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // find user by email and get first name
-    $stmt = $conn->prepare("SELECT user_id, user_first_name FROM users WHERE user_email_address = ?");
+    $stmt = $database_connection->prepare("SELECT USER_ID, USER_FIRST_NAME FROM USER WHERE USER_EMAIL_ADDRESS = ?");
     // bind email
     $stmt->bind_param("s", $email);
     // run query
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($result->num_rows === 1) {
         // get user data
         $user = $result->fetch_assoc();
-        $firstName = $user['user_first_name'];
+        $firstName = $user['USER_FIRST_NAME'];
 
         // create random token
         $token = bin2hex(random_bytes(32));
@@ -35,14 +35,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $expires = date("Y-m-d H:i:s", strtotime('+1 hour'));
 
         // save token to database
-        $saveToken = $conn->prepare("INSERT INTO password_reset (user_email, token, expires_at) VALUES (?, ?, ?)");
+        $saveToken = $database_connection->prepare("INSERT INTO password_reset (user_email, token, expires_at) VALUES (?, ?, ?)");
         // bind values
         $saveToken->bind_param("sss", $email, $token, $expires);
         // save token
         $saveToken->execute();
 
-        // build reset link - FIXED TO POINT TO INDEX.HTML
-        $reset_link = "http://localhost/MealHaven%20Web/index.html?token=" . $token;
+        // build reset link
+        $reset_link = "http://localhost/MealHaven/HTML/main_website.html?token=" . $token;
 
         // email subject
         $subject = "MealHaven Password Reset Request";
@@ -59,8 +59,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <!-- Logo and Brand -->
             <tr>
                 <td align='center' style='padding-bottom: 24px;'>
-                    <img src='http://localhost/MealHaven%20Web/Assets/logo.png' alt='MealHaven' width='60' height='60' style='display: inline-block; vertical-align: middle; margin-right: 12px;' />
-                    <span style='font-weight: bold; font-size: 28px; vertical-align: middle; white-space: nowrap;'>
+                    <svg class='logo' viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg' style='width: 60px; height: 60px; display: inline-block; vertical-align: middle; margin-right: 12px;'>
+                        <path d='M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z' fill='#22c55e' opacity='0.9' />
+                        <path d='M16 56l48-28 48 28v10l-48-26-48 26V56z' fill='#22c55e' />
+                        <path d='M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z' fill='#f97316' opacity='0.9' />
+                        <path d='M56 88a8 8 0 0 1 16 0v26H56V88z' fill='#1e293b' opacity='0.85' />
+                        <g fill='#1e293b' opacity='0.85'>
+                            <rect x='44' y='66' width='10' height='10' rx='1.5' />
+                            <rect x='58' y='66' width='10' height='10' rx='1.5' />
+                        </g>
+                        <path d='M40 106V70c0-1.7 1.3-3 3-3s3 1.3 3 3v8h2v-8c0-1.7 1.3-3 3-3s3 1.3 3 3v36h-14z' fill='#1e293b' opacity='0.85' />
+                        <path d='M82 70c0-4.4 3.6-8 8-8s8 3.6 8 8c0 3.2-1.8 6-4.4 7.3V106H86V77.3c-2.6-1.3-4.4-4.1-4.4-7.3z' fill='#1e293b' opacity='0.85' />
+                    </svg>
+                    <span style='font-weight: 800; font-size: 24px; letter-spacing: -0.5px; vertical-align: middle;'>
                         <span style='color: #22c55e;'>MEAL</span> <span style='color: #f97316;'>HAVEN</span>
                     </span>
                 </td>
@@ -153,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             h2 { color: var(--success); margin-bottom: 12px; font-size: 24px; }
             p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
         </style>
-        <meta http-equiv="refresh" content="4;url=../index.html" />
+        <meta http-equiv="refresh" content="4;url=../HTML/main_website.html" />
         </head>
         <body>
         <div class="success-card">
@@ -188,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // close statement
         $saveToken->close();
     } else {
-        // user not found - don't reveal this for security
+        // user not found
         echo '
         <!DOCTYPE html>
         <html lang="en">
@@ -213,7 +224,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             h2 { color: var(--success); margin-bottom: 12px; font-size: 24px; }
             p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
         </style>
-        <meta http-equiv="refresh" content="4;url=../index.html" />
+        <meta http-equiv="refresh" content="4;url=../HTML/main_website.html" />
         </head>
         <body>
         <div class="success-card">
@@ -244,5 +255,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // close statement and connection
     $stmt->close();
-    $conn->close();
+    $database_connection->close();
 }

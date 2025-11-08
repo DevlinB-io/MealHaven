@@ -1,4 +1,4 @@
-<!-- Authentication Modals - Complete Working Version -->
+<!-- Authentication Modals -->
 <style>
   :root {
     --primary: #22c55e;
@@ -11,6 +11,7 @@
     --surface: #f8fafc;
     --border: #e2e8f0;
     --error: #ef4444;
+    --success: #10b981;
   }
 
   .auth-modal {
@@ -54,6 +55,12 @@
     color: var(--text-light);
     font-size: 24px;
     cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .auth-modal-close:hover {
+    background: var(--surface);
+    color: var(--text);
   }
 
   .auth-modal .header {
@@ -77,6 +84,7 @@
   .auth-modal .brand {
     font-weight: 800;
     font-size: 28px;
+    letter-spacing: -0.5px;
   }
 
   .auth-modal .brand .meal {
@@ -91,11 +99,13 @@
     font-size: 26px;
     font-weight: 700;
     margin-bottom: 8px;
+    color: var(--text);
   }
 
   .auth-modal .subtitle {
     color: var(--text-light);
     font-size: 16px;
+    line-height: 1.5;
   }
 
   .auth-modal .form {
@@ -116,6 +126,10 @@
     color: var(--text);
   }
 
+  .auth-modal .input-container {
+    position: relative;
+  }
+
   .auth-modal .input {
     width: 100%;
     padding: 15px 16px;
@@ -124,6 +138,8 @@
     background: var(--surface);
     font-size: 16px;
     font-family: "Inter", sans-serif;
+    color: var(--text);
+    transition: all 0.2s ease;
   }
 
   .auth-modal .input:focus {
@@ -132,10 +148,62 @@
     box-shadow: 0 0 0 3px var(--primary-light);
   }
 
+  .auth-modal .input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .auth-modal .input::placeholder {
+    color: #94a3b8;
+  }
+
+  /* Password toggle button */
+  .auth-modal .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-modal .password-toggle:hover {
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .auth-modal .password-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+
   .auth-modal .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
+  }
+
+  .auth-modal .error-message {
+    color: var(--error);
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .auth-modal .error-message.hidden {
+    display: none;
   }
 
   .auth-modal .submit-btn {
@@ -149,10 +217,16 @@
     font-weight: 600;
     cursor: pointer;
     width: 100%;
+    transition: all 0.2s ease;
   }
 
   .auth-modal .submit-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  }
+
+  .auth-modal .submit-btn:active {
+    transform: translateY(0);
   }
 
   .auth-modal .divider {
@@ -182,6 +256,32 @@
     border: 1.5px solid var(--border);
     font-weight: 600;
     cursor: pointer;
+    text-align: center;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+
+  .auth-modal .alt-action:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--primary);
+  }
+
+  /* footnote */
+  .footnote {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .footnote a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .footnote a:hover {
+    text-decoration: underline;
   }
 
   .auth-modal .footer {
@@ -199,8 +299,8 @@
     font-weight: 500;
   }
 
-  .auth-modal .input-container {
-    position: relative;
+  .auth-modal .footer button:hover {
+    text-decoration: underline;
   }
 
   .auth-modal .forgot-password {
@@ -211,6 +311,68 @@
     cursor: pointer;
     text-align: right;
     margin-top: -8px;
+    font-weight: 500;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+    margin-top: 28px;
+    line-height: 1.5;
+  }
+
+  .footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .footer a:hover {
+    text-decoration: underline;
+  }
+
+  .auth-modal .forgot-password:hover {
+    text-decoration: underline;
+  }
+
+  /* Password strength indicator */
+  .password-strength {
+    margin-top: 8px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .password-strength-meter {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+
+  .strength-weak {
+    width: 25%;
+    background: var(--error);
+  }
+  .strength-fair {
+    width: 50%;
+    background: #f59e0b;
+  }
+  .strength-good {
+    width: 75%;
+    background: #3b82f6;
+  }
+  .strength-strong {
+    width: 100%;
+    background: var(--success);
+  }
+
+  .password-strength-text {
+    font-size: 12px;
+    margin-top: 4px;
+    color: var(--text-light);
   }
 </style>
 
@@ -222,7 +384,6 @@
 
       <header class="header">
         <div class="logo-container">
-          <!-- MealHaven Logo SVG -->
           <svg
             class="logo"
             viewBox="0 0 128 128"
@@ -231,7 +392,7 @@
           >
             <defs>
               <filter
-                id="soft-glow-green"
+                id="soft-glow-green-login"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -244,7 +405,7 @@
                 </feMerge>
               </filter>
               <filter
-                id="soft-glow-orange"
+                id="soft-glow-orange-login"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -261,14 +422,14 @@
               d="M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z"
               fill="#22c55e"
               opacity="0.9"
-              filter="url(#soft-glow-green)"
+              filter="url(#soft-glow-green-login)"
             />
             <path d="M16 56l48-28 48 28v10l-48-26-48 26V56z" fill="#22c55e" />
             <path
               d="M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z"
               fill="#f97316"
               opacity="0.9"
-              filter="url(#soft-glow-orange)"
+              filter="url(#soft-glow-orange-login)"
             />
             <path
               d="M56 88a8 8 0 0 1 16 0v26H56V88z"
@@ -298,15 +459,64 @@
         <p class="subtitle">Sign in to your account</p>
       </header>
 
-      <form action="php/login_user.php" method="POST" class="form">
+      <form
+        action="../PHP/login_user.php"
+        method="POST"
+        class="form"
+        id="login-form"
+      >
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" name="email" class="input" required />
+          <input
+            type="email"
+            name="email"
+            class="input"
+            placeholder="your.email@example.com"
+            required
+          />
+          <div class="error-message hidden" id="login-email-error"></div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" name="password" class="input" required />
+          <div class="input-container">
+            <input
+              type="password"
+              name="password"
+              id="login-password"
+              class="input"
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              data-toggle="login-password"
+              aria-label="Show password"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="error-message hidden" id="login-password-error"></div>
         </div>
 
         <button type="button" class="forgot-password" data-switch="forgotModal">
@@ -325,6 +535,11 @@
       <button type="button" class="alt-action" data-switch="registerModal">
         Create account
       </button>
+      <!-- Footer note -->
+      <p class="footnote">
+        By creating an account, you agree to our
+        <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+      </p>
     </div>
   </div>
 </dialog>
@@ -339,7 +554,6 @@
 
       <header class="header">
         <div class="logo-container">
-          <!-- MealHaven Logo SVG -->
           <svg
             class="logo"
             viewBox="0 0 128 128"
@@ -348,7 +562,7 @@
           >
             <defs>
               <filter
-                id="soft-glow-green-2"
+                id="soft-glow-green-register"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -361,7 +575,7 @@
                 </feMerge>
               </filter>
               <filter
-                id="soft-glow-orange-2"
+                id="soft-glow-orange-register"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -378,14 +592,14 @@
               d="M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z"
               fill="#22c55e"
               opacity="0.9"
-              filter="url(#soft-glow-green-2)"
+              filter="url(#soft-glow-green-register)"
             />
             <path d="M16 56l48-28 48 28v10l-48-26-48 26V56z" fill="#22c55e" />
             <path
               d="M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z"
               fill="#f97316"
               opacity="0.9"
-              filter="url(#soft-glow-orange-2)"
+              filter="url(#soft-glow-orange-register)"
             />
             <path
               d="M56 88a8 8 0 0 1 16 0v26H56V88z"
@@ -415,41 +629,144 @@
         <p class="subtitle">Join MealHaven and start planning</p>
       </header>
 
-      <form action="php/register_user.php" method="POST" class="form">
+      <form
+        action="../PHP/register_user.php"
+        method="POST"
+        class="form"
+        id="register-form"
+      >
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">First Name</label>
-            <input type="text" name="first_name" class="input" required />
+            <input
+              type="text"
+              name="first_name"
+              class="input"
+              placeholder="John"
+              required
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Last Name</label>
-            <input type="text" name="last_name" class="input" required />
+            <input
+              type="text"
+              name="last_name"
+              class="input"
+              placeholder="Doe"
+              required
+            />
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" name="email" class="input" required />
+          <input
+            type="email"
+            name="email"
+            class="input"
+            placeholder="your.email@example.com"
+            required
+          />
         </div>
 
         <div class="form-group">
           <label class="form-label">Phone Number</label>
-          <input type="tel" name="phone" class="input" required />
+          <input
+            type="tel"
+            name="phone"
+            class="input"
+            placeholder="0123456789"
+            required
+          />
         </div>
 
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" name="password" class="input" required />
+          <div class="input-container">
+            <input
+              type="password"
+              name="password"
+              id="register-password"
+              class="input"
+              placeholder="Create a password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              data-toggle="register-password"
+              aria-label="Show password"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="password-strength">
+            <div
+              class="password-strength-meter"
+              id="register-strength-meter"
+            ></div>
+          </div>
+          <div class="password-strength-text" id="register-strength-text"></div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Confirm Password</label>
-          <input
-            type="password"
-            name="confirm_password"
-            class="input"
-            required
-          />
+          <div class="input-container">
+            <input
+              type="password"
+              name="confirm_password"
+              id="register-confirm-password"
+              class="input"
+              placeholder="Confirm your password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              data-toggle="register-confirm-password"
+              aria-label="Show password"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn">Create Account</button>
@@ -462,8 +779,13 @@
       </div>
 
       <button type="button" class="alt-action" data-switch="loginModal">
-        Sign in
+        Log in
       </button>
+      <!-- Footer note -->
+      <p class="footnote">
+        By creating an account, you agree to our
+        <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+      </p>
     </div>
   </div>
 </dialog>
@@ -476,7 +798,6 @@
 
       <header class="header">
         <div class="logo-container">
-          <!-- MealHaven Logo SVG -->
           <svg
             class="logo"
             viewBox="0 0 128 128"
@@ -485,7 +806,7 @@
           >
             <defs>
               <filter
-                id="soft-glow-green-3"
+                id="soft-glow-green-forgot"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -498,7 +819,7 @@
                 </feMerge>
               </filter>
               <filter
-                id="soft-glow-orange-3"
+                id="soft-glow-orange-forgot"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -515,14 +836,14 @@
               d="M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z"
               fill="#22c55e"
               opacity="0.9"
-              filter="url(#soft-glow-green-3)"
+              filter="url(#soft-glow-green-forgot)"
             />
             <path d="M16 56l48-28 48 28v10l-48-26-48 26V56z" fill="#22c55e" />
             <path
               d="M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z"
               fill="#f97316"
               opacity="0.9"
-              filter="url(#soft-glow-orange-3)"
+              filter="url(#soft-glow-orange-forgot)"
             />
             <path
               d="M56 88a8 8 0 0 1 16 0v26H56V88z"
@@ -550,14 +871,21 @@
         </div>
         <h1 class="title">Reset your password</h1>
         <p class="subtitle">
-          Enter your email address and we'll send you instructions
+          Enter your email address and we'll send you instructions to reset your
+          password.
         </p>
       </header>
 
-      <form action="php/forgot_password.php" method="POST" class="form">
+      <form action="../PHP/forgot_password.php" method="POST" class="form">
         <div class="form-group">
           <label class="form-label">Email address</label>
-          <input type="email" name="email" class="input" required />
+          <input
+            type="email"
+            name="email"
+            class="input"
+            placeholder="your.email@example.com"
+            required
+          />
         </div>
 
         <button type="submit" class="submit-btn">
@@ -574,11 +902,15 @@
       <button type="button" class="alt-action" data-switch="loginModal">
         Back to Sign In
       </button>
+      <p class="footer">
+        Need help?
+        <a href="mailto:support@mealhaven.com">Contact our support team</a>
+      </p>
     </div>
   </div>
 </dialog>
 
-<!-- Reset Password Modal - THIS IS THE CRITICAL ONE -->
+<!-- Reset Password Modal -->
 <dialog id="resetModal" class="auth-modal">
   <div class="card">
     <div class="card-content">
@@ -586,7 +918,6 @@
 
       <header class="header">
         <div class="logo-container">
-          <!-- MealHaven Logo SVG -->
           <svg
             class="logo"
             viewBox="0 0 128 128"
@@ -595,7 +926,7 @@
           >
             <defs>
               <filter
-                id="soft-glow-green-4"
+                id="soft-glow-green-reset"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -608,7 +939,7 @@
                 </feMerge>
               </filter>
               <filter
-                id="soft-glow-orange-4"
+                id="soft-glow-orange-reset"
                 x="-50%"
                 y="-50%"
                 width="200%"
@@ -625,14 +956,14 @@
               d="M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z"
               fill="#22c55e"
               opacity="0.9"
-              filter="url(#soft-glow-green-4)"
+              filter="url(#soft-glow-green-reset)"
             />
             <path d="M16 56l48-28 48 28v10l-48-26-48 26V56z" fill="#22c55e" />
             <path
               d="M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z"
               fill="#f97316"
               opacity="0.9"
-              filter="url(#soft-glow-orange-4)"
+              filter="url(#soft-glow-orange-reset)"
             />
             <path
               d="M56 88a8 8 0 0 1 16 0v26H56V88z"
@@ -662,29 +993,97 @@
         <p class="subtitle">Enter your new password</p>
       </header>
 
-      <form action="php/reset_password.php" method="POST" class="form">
-        <!-- CRITICAL: Hidden token field -->
+      <form action="../PHP/reset_password.php" method="POST" class="form">
         <input type="hidden" name="token" id="resetToken" />
 
         <div class="form-group">
           <label class="form-label">New Password</label>
-          <input
-            type="password"
-            name="password"
-            class="input"
-            required
-            minlength="8"
-          />
+          <div class="input-container">
+            <input
+              type="password"
+              name="password"
+              id="reset-password"
+              class="input"
+              placeholder="Create a new password"
+              required
+              minlength="8"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              data-toggle="reset-password"
+              aria-label="Show password"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="password-strength">
+            <div
+              class="password-strength-meter"
+              id="reset-strength-meter"
+            ></div>
+          </div>
+          <div class="password-strength-text" id="reset-strength-text"></div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Confirm Password</label>
-          <input
-            type="password"
-            name="confirm_password"
-            class="input"
-            required
-          />
+          <div class="input-container">
+            <input
+              type="password"
+              name="confirm_password"
+              id="reset-confirm-password"
+              class="input"
+              placeholder="Confirm your new password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              data-toggle="reset-confirm-password"
+              aria-label="Show password"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn">Reset Password</button>
@@ -696,25 +1095,3 @@
     </div>
   </div>
 </dialog>
-
-<script>
-  // Modal switching
-  document.addEventListener("click", function (e) {
-    const switchBtn = e.target.closest("[data-switch]");
-    if (switchBtn) {
-      const targetId = switchBtn.getAttribute("data-switch");
-      // Close all modals
-      document.querySelectorAll(".auth-modal").forEach((m) => m.close());
-      // Open target modal
-      const targetModal = document.getElementById(targetId);
-      if (targetModal) targetModal.showModal();
-    }
-
-    const closeBtn = e.target.closest("[data-close]");
-    if (closeBtn) {
-      const modalId = closeBtn.getAttribute("data-close");
-      const modal = document.getElementById(modalId);
-      if (modal) modal.close();
-    }
-  });
-</script>

@@ -187,7 +187,19 @@ CREATE TABLE IF NOT EXISTS SHOP_INVENTORY (
 )
 ");
 
+// =============================
+// PASSWORD RESET TABLE - ADDED BY DEVLIN
+// =============================
+$database_connection->query("
+CREATE TABLE IF NOT EXISTS password_reset (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+");
+
 $database_connection->query("SET FOREIGN_KEY_CHECKS = 1");
 
 $database_connection->close();
-?>

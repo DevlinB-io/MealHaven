@@ -1,6 +1,6 @@
 // check if user is logged in
 function checkLoginStatus() {
-  fetch('php/check_session.php')
+  fetch('../PHP/check_session.php')
     .then(response => response.json())
     .then(data => {
       if (data.loggedIn) {
@@ -63,7 +63,7 @@ document.getElementById('home').classList.add('active');
 // logout user
 function handleLogout() {
   // go to logout script
-  window.location.href = 'php/logout.php';
+  window.location.href = '../PHP/logout.php';
 }
 
 // run on page load

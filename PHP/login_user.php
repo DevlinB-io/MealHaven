@@ -1,6 +1,6 @@
 <?php
 // connect to database
-require_once 'db_connect.php';
+require_once '../DATABASE/database_connection.php';
 
 // check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // find user by email
-    $stmt = $conn->prepare("SELECT user_id, user_password FROM users WHERE user_email_address = ?");
+    $stmt = $database_connection->prepare("SELECT USER_ID, PASSWORD FROM USER WHERE USER_EMAIL_ADDRESS = ?");
 
     // bind email
     $stmt->bind_param("s", $email);
@@ -33,16 +33,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $user = $result->fetch_assoc();
 
         // check password matches
-        if (password_verify($password, $user['user_password'])) {
+        if (password_verify($password, $user['PASSWORD'])) {
 
             // start session
             session_start();
 
             // store user id
-            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['user_id'] = $user['USER_ID'];
 
             // go to homepage
-            header("Location: ../index.html");
+            header("Location: ../HTML/main_website.html");
             exit();
         } else {
             showErrorPage("Invalid password. Please try again.");
@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // close statement and connection
     $stmt->close();
-    $conn->close();
+    $database_connection->close();
 }
 
 function showErrorPage($message)
@@ -89,7 +89,7 @@ p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; }
 a.btn { display: inline-block; background: var(--error); color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; }
 a.btn:hover { background: #dc2626; transform: translateY(-2px); }
 </style>
-<meta http-equiv="refresh" content="3;url=../index.html" />
+<meta http-equiv="refresh" content="3;url=../HTML/main_website.html" />
 </head>
 <body>
 <div class="error-card">
@@ -112,7 +112,7 @@ a.btn:hover { background: #dc2626; transform: translateY(-2px); }
     </div>
     <h2>Login Failed</h2>
     <p>' . htmlspecialchars($message) . '</p>
-    <a href="../index.html" class="btn">Back to Login</a>
+    <a href="../HTML/main_website.html" class="btn">Back to Login</a>
 </div>
 </body>
 </html>';

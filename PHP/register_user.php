@@ -1,7 +1,7 @@
 <?php
 
 // connect to database
-require_once 'db_connect.php';
+require_once '../DATABASE/database_connection.php';
 
 // check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // check if email already exists
-    $checkEmail = $conn->prepare("SELECT user_email_address FROM users WHERE user_email_address = ?");
+    $checkEmail = $database_connection->prepare("SELECT USER_EMAIL_ADDRESS FROM USER WHERE USER_EMAIL_ADDRESS = ?");
 
     // bind email
     $checkEmail->bind_param("s", $email);
@@ -44,9 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // prepare insert query
-    $stmt = $conn->prepare("
-    INSERT INTO users
-    (user_first_name, user_last_name, user_email_address, user_phone_number, user_password)
+    $stmt = $database_connection->prepare("
+    INSERT INTO USER
+    (USER_FIRST_NAME, USER_LAST_NAME, USER_EMAIL_ADDRESS, USER_PHONE_NUMBER, PASSWORD)
     VALUES (?, ?, ?, ?, ?)");
 
     // bind all values
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         session_start();
 
         // get new user id
-        $newUserId = $conn->insert_id;
+        $newUserId = $database_connection->insert_id;
 
         // store user id in session
         $_SESSION['user_id'] = $newUserId;
@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $checkEmail->close();
 
     // close connection
-    $conn->close();
+    $database_connection->close();
 }
 
 function showErrorPage($message)
@@ -110,7 +110,7 @@ p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; }
 a.btn { display: inline-block; background: var(--error); color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; }
 a.btn:hover { background: #dc2626; transform: translateY(-2px); }
 </style>
-<meta http-equiv="refresh" content="3;url=../index.html" />
+<meta http-equiv="refresh" content="3;url=../HTML/main_website.html" />
 </head>
 <body>
 <div class="error-card">
@@ -133,7 +133,7 @@ a.btn:hover { background: #dc2626; transform: translateY(-2px); }
     </div>
     <h2>Registration Failed</h2>
     <p>' . htmlspecialchars($message) . '</p>
-    <a href="../index.html" class="btn">Back to Sign Up</a>
+    <a href="../HTML/main_website.html" class="btn">Back to Sign Up</a>
 </div>
 </body>
 </html>';
@@ -167,7 +167,7 @@ p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; }
 a.btn { display: inline-block; background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; }
 a.btn:hover { background: #16a34a; transform: translateY(-2px); }
 </style>
-<meta http-equiv="refresh" content="2;url=../index.html" />
+<meta http-equiv="refresh" content="2;url=../HTML/main_website.html" />
 </head>
 <body>
 <div class="success-card">
@@ -190,7 +190,7 @@ a.btn:hover { background: #16a34a; transform: translateY(-2px); }
     </div>
     <h2>Welcome to MealHaven!</h2>
     <p>' . htmlspecialchars($message) . '</p>
-    <a href="../index.html" class="btn">Get Started</a>
+    <a href="../HTML/main_website.html" class="btn">Get Started</a>
 </div>
 </body>
 </html>';

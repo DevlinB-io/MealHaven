@@ -1,7 +1,7 @@
 <?php
 
 // connect to database
-require_once 'db_connect.php';
+require_once '../DATABASE/database_connection.php';
 
 // check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // find reset token
-    $stmt = $conn->prepare("SELECT user_email, expires_at FROM password_reset WHERE token = ?");
+    $stmt = $database_connection->prepare("SELECT user_email, expires_at FROM password_reset WHERE token = ?");
     // bind token
     $stmt->bind_param("s", $token);
     // run query
@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
         // update user password
-        $update = $conn->prepare("UPDATE users SET user_password = ? WHERE user_email_address = ?");
+        $update = $database_connection->prepare("UPDATE USER SET PASSWORD = ? WHERE USER_EMAIL_ADDRESS = ?");
         // bind password and email
         $update->bind_param("ss", $hashed_password, $email);
 
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     a.btn { display: inline-block; background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; }
     a.btn:hover { background: #16a34a; transform: translateY(-2px); }
 </style>
-<meta http-equiv="refresh" content="3;url=../index.html" />
+<meta http-equiv="refresh" content="3;url=../HTML/main_website.html" />
 </head>
 <body>
 <div class="success-card">
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
     <h2>Password Reset Successful</h2>
     <p>Your password has been reset successfully.</p>
-    <a href="../index.html" class="btn">Login</a>
+    <a href="../HTML/main_website.html" class="btn">Login</a>
 </div>
 </body>
 </html>';
@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         // delete used token
-        $delete = $conn->prepare("DELETE FROM password_reset WHERE token = ?");
+        $delete = $database_connection->prepare("DELETE FROM password_reset WHERE token = ?");
         // bind token
         $delete->bind_param("s", $token);
         // remove token
@@ -128,5 +128,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // close statement and connection
     $stmt->close();
-    $conn->close();
+    $database_connection->close();
 }

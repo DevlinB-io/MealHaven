@@ -39,6 +39,27 @@
             <span class="bell" aria-hidden="true">🔔</span>
             <span id="notifBadge" class="badge" hidden>0</span>
           </button>
+
+          <!-- sign up button (shows when not logged in) -->
+          <button
+            id="signupBtn"
+            class="btn"
+            onclick="openAuthModal('registerModal')"
+            style="margin-right: 8px"
+          >
+            Sign up
+          </button>
+
+          <!-- log in button (shows when not logged in) -->
+          <button
+            id="loginBtn"
+            class="btn primary"
+            onclick="openAuthModal('loginModal')"
+            style="margin-right: 8px"
+          >
+            Log in
+          </button>
+
           <button
             id="profileBtn"
             class="avatar"
@@ -481,6 +502,53 @@
         </div>
       </div>
     </dialog>
+
+    <!-- Authentication Modals Loader -->
+    <script>
+      // Placeholder function until auth-modal.js loads
+      window.openAuthModal = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.showModal();
+        }
+      };
+
+      // Check for token first before loading anything
+      const urlParams = new URLSearchParams(window.location.search);
+      const resetToken = urlParams.get("token");
+
+      // Load auth modals from auth folder
+      fetch("../HTML/auth-modals.html")
+        .then((r) => r.text())
+        .then((html) => {
+          // Insert modals into page
+          document.body.insertAdjacentHTML("beforeend", html);
+
+          // If a reset token exist, populate it and open modal
+          if (resetToken) {
+            const tokenField = document.getElementById("resetToken");
+            if (tokenField) {
+              tokenField.value = resetToken;
+              // Wait for modal to be ready
+              setTimeout(() => {
+                const resetModal = document.getElementById("resetModal");
+                if (resetModal) {
+                  resetModal.showModal();
+                }
+              }, 100);
+            }
+          }
+
+          // load auth-modal.js for button handlers
+          const script = document.createElement("script");
+          script.src = "../JAVASCRIPT/auth-modal.js";
+          document.body.appendChild(script);
+        })
+        .catch((err) => console.error("Failed to load auth modals:", err));
+    </script>
+
+    <!-- manage user sessions -->
+    <script src="../JAVASCRIPT/session-handler.js"></script>
 
     <script src="../JAVASCRIPT/main_website.js"></script>
   </body>
