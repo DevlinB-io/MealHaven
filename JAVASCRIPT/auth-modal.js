@@ -1,5 +1,3 @@
-// Authentication Modal Handler with Password Toggle and Strength Meter
-
 // open modal
 function openAuthModal(modalId) {
   const modal = document.getElementById(modalId);
@@ -41,7 +39,7 @@ document.querySelectorAll('[data-switch]').forEach(btn => {
   });
 });
 
-// Password Toggle Functionality
+// password toggle function
 document.querySelectorAll('.password-toggle').forEach(toggle => {
   toggle.addEventListener('click', function() {
     const inputId = this.getAttribute('data-toggle');
@@ -52,7 +50,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
     const isPassword = input.type === 'password';
     input.type = isPassword ? 'text' : 'password';
     
-    // Update icon
+    // update icon
     const svg = this.querySelector('svg');
     if (isPassword) {
       this.setAttribute('aria-label', 'Hide password');
@@ -72,7 +70,7 @@ document.querySelectorAll('.password-toggle').forEach(toggle => {
   });
 });
 
-// Password Strength Meter
+// password strength meter
 function checkPasswordStrength(password) {
   let strength = 0;
   
@@ -96,7 +94,7 @@ function updatePasswordStrength(passwordId, meterId, textId) {
     const value = this.value;
     const strength = checkPasswordStrength(value);
     
-    // Remove all strength classes
+    // remove strength classes
     meter.className = 'password-strength-meter';
     
     if (value.length === 0) {
@@ -124,14 +122,14 @@ function updatePasswordStrength(passwordId, meterId, textId) {
   });
 }
 
-// Initialize password strength meters
+// initialize password strength meters
 updatePasswordStrength('register-password', 'register-strength-meter', 'register-strength-text');
 updatePasswordStrength('reset-password', 'reset-strength-meter', 'reset-strength-text');
 
 // make function available globally
 window.openAuthModal = openAuthModal;
 
-// prevent closing on outside click (optional - remove if you want outside click to close)
+// prevent closing on outside click
 document.querySelectorAll('.auth-modal').forEach(modal => {
   modal.addEventListener('click', e => {
     const card = modal.querySelector('.card');
@@ -146,7 +144,6 @@ document.querySelectorAll('.auth-modal').forEach(modal => {
 
     if (clickedOutside) {
       e.stopPropagation();
-      // Uncomment next line if you want modal to close when clicking outside
       // modal.close();
     }
   });
