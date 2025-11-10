@@ -4,28 +4,6 @@
 // Updated for: Pantry Recipes grouping; qty "-" never removes (keeps at 0);
 // ingredients coverage counts only pantry items with qty > 0.
 // Added: Hover/tilt motion on recipe cards.
-// Added: Login check for navigation
-
-/* ----------------- Login Check for Navigation ----------------- */
-function checkLoginBeforeNavigation(view) {
-  // Check if user is logged in by looking at the UI state
-  const loginBtn = document.getElementById("loginBtn");
-  const signupBtn = document.getElementById("signupBtn");
-
-  // If login/signup buttons are visible, user is not logged in
-  if (
-    loginBtn &&
-    signupBtn &&
-    (getComputedStyle(loginBtn).display !== "none" ||
-      getComputedStyle(signupBtn).display !== "none")
-  ) {
-    // User is not logged in, redirect to login
-    openAuthModal("loginModal");
-    return false;
-  }
-
-  return true; // User is logged in, proceed with navigation
-}
 
 /* ----------------- Utilities ----------------- */
 const qs = (sel, ctx = document) => ctx.querySelector(sel);
@@ -49,7 +27,7 @@ const setLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 const SAMPLE_RECIPES = [
   {
     id: "r1",
-    image: "../IMAGES/Pizza.jpg",
+    image: "assets/Pizza.jpg",
     title: "Salami & Cheese Pizza",
     minutes: 30,
     category: "Mixed Dishes/Meals",
@@ -69,7 +47,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r2",
-    image: "../IMAGES/Crispy Shrimp.jpg",
+    image: "assets/Crispy Shrimp.jpg",
     title: "Crispy Shrimp",
     minutes: 20,
     category: "Proteins & Legumes",
@@ -78,7 +56,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r3",
-    image: "../IMAGES/Sticky Chicken Wings.jpg",
+    image: "assets/Sticky Chicken Wings.jpg",
     title: "Sticky Chicken Wings",
     minutes: 30,
     category: "Proteins & Legumes",
@@ -87,7 +65,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r4",
-    image: "../IMAGES/Veggie Omelette.jpg",
+    image: "assets/Veggie Omelette.jpg",
     title: "Veggie Omelette",
     minutes: 10,
     category: "Mixed Dishes/Meals",
@@ -96,7 +74,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r5",
-    image: "../IMAGES/Grilled Lemon Salmon.jpg",
+    image: "assets/Grilled Lemon Salmon.jpg",
     title: "Grilled Lemon Salmon",
     minutes: 25,
     category: "Proteins & Legumes",
@@ -105,7 +83,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r6",
-    image: "../IMAGES/Beef Tacos.jpg",
+    image: "assets/Beef Tacos.jpg",
     title: "Beef Tacos",
     minutes: 20,
     category: "Mixed Dishes/Meals",
@@ -114,7 +92,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r7",
-    image: "../IMAGES/Pasta Carbonara.jpg",
+    image: "assets/Pasta Carbonara.jpg",
     title: "Pasta Carbonara",
     minutes: 20,
     category: "Grains & Starches",
@@ -123,7 +101,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r8",
-    image: "../IMAGES/Avocado Toast.jpg",
+    image: "assets/Avocado Toast.jpg",
     title: "Avocado Toast",
     minutes: 10,
     category: "Mixed Dishes/Meals",
@@ -132,7 +110,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r9",
-    image: "../IMAGES/Chicken Curry.jpg",
+    image: "assets/Chicken Curry.jpg",
     title: "Chicken Curry",
     minutes: 40,
     category: "Mixed Dishes/Meals",
@@ -141,7 +119,7 @@ const SAMPLE_RECIPES = [
   },
   {
     id: "r10",
-    image: "../IMAGES/Fruit Smoothie.png",
+    image: "assets/Fruit Smoothie.png",
     title: "Tropical Fruit Smoothie",
     minutes: 5,
     category: "Beverages",
@@ -255,30 +233,17 @@ function persist() {
 qsa(".tab").forEach((btn) =>
   btn.addEventListener("click", () => {
     const view = btn.dataset.view;
-
-    // Check login before proceeding (except home)
-    if (view !== "home" && !checkLoginBeforeNavigation(view)) {
-      return;
-    }
-
     showView(view);
     localStorage.setItem("mh_last_view", view);
   })
 );
-
 function showView(view) {
-  // Check if user needs to login before navigating (except home view)
-  if (view !== "home" && !checkLoginBeforeNavigation(view)) {
-    return; // Stop navigation if not logged in
-  }
-
   qsa(".tab").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === view)
   );
   qsa(".view").forEach((v) => v.classList.toggle("active", v.id === view));
   render();
 }
-
 showView(localStorage.getItem("mh_last_view") || "home");
 
 /* ----------------- Theme ----------------- */
@@ -537,9 +502,8 @@ function renderTrending() {
       .join("") || "<p>No recipes yet.</p>";
   hookRecipeButtons(wrap);
   hookIngredientChecks(wrap);
-  hookRecipeHoverMotion(wrap);
+  hookRecipeHoverMotion(wrap); // <-- added
 }
-
 function renderExpiringSoon() {
   const ul = qs("#expiringList");
   if (!ul) return;
@@ -565,7 +529,6 @@ function renderExpiringSoon() {
         .join("")
     : "<li>Nothing expiring soon 🎉</li>";
 }
-
 function renderPantrySummary() {
   const el = qs("#pantrySummary");
   if (!el) return;
@@ -577,7 +540,6 @@ function renderPantrySummary() {
     <div class="stat"><div class="kpi low">${low}</div><div>Low</div></div>
     <div class="stat"><div class="kpi out">${out}</div><div>Out</div></div>`;
 }
-
 function renderWeekStrip() {
   const wrap = qs("#weeklySnapshot");
   if (!wrap) return;
@@ -601,44 +563,22 @@ function renderWeekStrip() {
         weekday: "short",
       })} ${d.getDate()}</h4>${pillsHTML}</div>`;
   }
-
-  // Update week strip day clicks with login check
   qsa("#weeklySnapshot .day").forEach((el) => {
     const go = () => {
       const key = el.dataset.date;
-      if (!checkLoginBeforeNavigation("recipes")) {
-        return;
-      }
       const dateFilter = qs("#recipesDateFilter");
       if (dateFilter) dateFilter.value = key;
       showView("recipes");
       localStorage.setItem("mh_last_view", "recipes");
       renderRecipes();
     };
-    el.onclick = go;
-    el.onkeydown = (e) => {
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         go();
       }
-    };
-  });
-}
-
-function updateHomeNavigationButtons() {
-  // Update "View all" buttons
-  qsa(".link-btn[data-view]").forEach((btn) => {
-    const targetView = btn.dataset.view;
-    if (targetView !== "home") {
-      btn.onclick = (e) => {
-        e.preventDefault();
-        if (!checkLoginBeforeNavigation(targetView)) {
-          return;
-        }
-        showView(targetView);
-        localStorage.setItem("mh_last_view", targetView);
-      };
-    }
+    });
   });
 }
 
@@ -834,7 +774,7 @@ function openRemoveIngredientDialog(ingredientName, checkboxEl) {
   const dlg = qs("#removeIngredientDialog");
   qs(
     "#removeIngText"
-  ).textContent = `Remove "${ingredientName}" from your pantry?`;
+  ).textContent = `Remove “${ingredientName}” from your pantry?`;
   const onClose = () => {
     if (dlg.returnValue === "cancel" && checkboxEl) checkboxEl.checked = true;
     dlg.removeEventListener("close", onClose);
@@ -1075,7 +1015,7 @@ function renderRecipes() {
 
   hookRecipeButtons(list);
   hookIngredientChecks(list);
-  hookRecipeHoverMotion(list);
+  hookRecipeHoverMotion(list); // <-- added
 
   // Show a small count badge on the Pantry Recipes button (fully complete)
   if (groupCoverageBtn) {
@@ -1101,13 +1041,6 @@ function renderRecipes() {
 /* Non-tab view switches */
 qsa("[data-view]:not(.tab)").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const view = btn.dataset.view;
-
-    // Check login before proceeding (except home)
-    if (view !== "home" && !checkLoginBeforeNavigation(view)) {
-      return;
-    }
-
     showView(btn.dataset.view);
     localStorage.setItem("mh_last_view", btn.dataset.view);
   });
@@ -1122,7 +1055,7 @@ function renderFavourites() {
     favs.map((r) => recipeCard(r, "")).join("") || "<p>No favourites yet.</p>";
   hookRecipeButtons(wrap);
   hookIngredientChecks(wrap);
-  hookRecipeHoverMotion(wrap);
+  hookRecipeHoverMotion(wrap); // <-- added
 }
 
 /* Planner (Calendar) */
@@ -1161,8 +1094,6 @@ function renderCalendar() {
       </div>`
     );
   }
-
-  // Update calendar cell clicks with login check
   qsa("#calendar .cell").forEach((cell) => {
     cell.querySelectorAll('[data-ev="del"]').forEach((btn) =>
       btn.addEventListener("click", (e) => {
@@ -1176,9 +1107,6 @@ function renderCalendar() {
       })
     );
     cell.addEventListener("click", () => {
-      if (!checkLoginBeforeNavigation("recipes")) {
-        return;
-      }
       const key = cell.dataset.date;
       const filter = qs("#recipesDateFilter");
       if (filter) filter.value = key;
@@ -1188,7 +1116,6 @@ function renderCalendar() {
     });
   });
 }
-
 qs("#prevMonth")?.addEventListener("click", () => {
   state.monthCursor.setMonth(state.monthCursor.getMonth() - 1);
   renderCalendar();
@@ -1197,7 +1124,6 @@ qs("#nextMonth")?.addEventListener("click", () => {
   state.monthCursor.setMonth(state.monthCursor.getMonth() + 1);
   renderCalendar();
 });
-
 function openPlanDialog(recipeId = null, dateKey = today(), editIndex = null) {
   const dlg = qs("#planDialog");
   const form = qs("#planForm");
@@ -1223,7 +1149,6 @@ function openPlanDialog(recipeId = null, dateKey = today(), editIndex = null) {
   };
   dlg.querySelector('button[value="cancel"]').onclick = () => dlg.close();
 }
-
 /* ----------------- Create Recipe dialog ----------------- */
 const recipeDialog = qs("#recipeDialog");
 const recipeForm = qs("#recipeForm");
@@ -1272,7 +1197,7 @@ async function saveRecipeFromForm(ev) {
       return p;
     }
     // fallback: keep a placeholder or first sample image
-    return "../IMAGES/placeholder.jpg";
+    return "assets/placeholder.jpg";
   })();
 
   const rec = {
@@ -1443,7 +1368,8 @@ qs("#recipeSearch")?.addEventListener("input", renderRecipes);
 qs("#recipesDateFilter")?.addEventListener("change", renderRecipes);
 qs("#recipeCategory")?.addEventListener("change", renderRecipes);
 
-// Pantry Recipes (grouping) toggle button
+// Pantry Recipes (grouping) toggle button -> add to your Recipes toolbar HTML:
+// <button id="pantryCoverageBtn" class="btn">Pantry Recipes</button>
 const pantryCoverageBtn = qs("#pantryCoverageBtn");
 if (pantryCoverageBtn) {
   pantryCoverageBtn.addEventListener("click", () => {
@@ -1462,9 +1388,7 @@ function renderHome() {
   renderExpiringSoon();
   renderPantrySummary();
   renderWeekStrip();
-  updateHomeNavigationButtons();
 }
-
 function render() {
   renderHome();
   renderRecipes();

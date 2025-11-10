@@ -11,6 +11,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../CSS/main_website.css" />
+    <link rel="stylesheet" href="../CSS/recipe_modal.css" />
   </head>
   <body>
     <!-- Top Navigation -->
@@ -418,30 +419,77 @@
       <form method="dialog" class="modal-body" id="recipeForm">
         <h3>Create Recipe</h3>
         <div class="form-grid">
-          <label>Recipe Name <input name="name" required /></label>
-          <label
-            >Ingredients
+          <label>
+            Recipe Name
+            <input name="name" required />
+          </label>
+
+          <label>
+            Description
+            <textarea
+              name="description"
+              rows="2"
+              placeholder="Short description..."
+            ></textarea>
+          </label>
+
+          <label>
+            Ingredients
             <textarea
               name="ingredients"
               rows="3"
-              placeholder="e.g., 2 eggs, 1 cup flour…"
+              placeholder="e.g., 2 eggs, 1 cup flour..."
               required
             ></textarea>
           </label>
-          <label
-            >Steps
+
+          <label>
+            Instructions
             <textarea
-              name="steps"
+              name="instructions"
               rows="3"
-              placeholder="Describe preparation steps…"
+              placeholder="Describe preparation steps..."
               required
             ></textarea>
           </label>
-          <label
-            >Upload Image <input type="file" name="image" accept="image/*"
-          /></label>
-          <label
-            >Category
+
+          <label>
+            Difficulty Level
+            <select name="difficulty">
+              <option value="EASY">Easy</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HARD">Hard</option>
+            </select>
+          </label>
+
+          <label>
+            Prep Time (minutes)
+            <input type="number" name="prep_time" min="0" step="1" value="0" />
+          </label>
+
+          <label>
+            Cooking Time (minutes)
+            <input type="number" name="cook_time" min="0" step="1" value="0" />
+          </label>
+
+          <label>
+            Calories
+            <input type="number" name="calories" min="0" step="0.1" />
+          </label>
+
+          <label>
+            Serving Size
+            <input
+              type="number"
+              name="serving_size"
+              min="1"
+              step="1"
+              value="1"
+            />
+          </label>
+
+          <label>
+            Category
             <select name="category">
               <option>Mixed Dishes/Meals</option>
               <option>Fruits</option>
@@ -454,10 +502,16 @@
               <option>Snacks & Sweets</option>
             </select>
           </label>
+
+          <label>
+            Upload Image
+            <input type="file" name="image" accept="image/*" />
+          </label>
         </div>
+
         <div class="modal-actions" role="toolbar">
-          <button id="recipeCancelBtn" class="btn" type="button">Cancel</button>
-          <button class="btn primary" value="default">Save</button>
+          <button class="btn" type="button" id="recipeCancelBtn">Cancel</button>
+          <button class="btn primary" type="submit">Save</button>
         </div>
       </form>
     </dialog>

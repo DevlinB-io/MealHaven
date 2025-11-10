@@ -15,7 +15,7 @@ window.addEventListener("load", function () {
     // After the fade completes, redirect to your main page
     setTimeout(function () {
       console.log("Redirecting to main page...");
-      window.location.href = "../HTML/main_website.html"; // change to your target page
+      window.location.href = "../HTML/login.html"; // change to your target page
     }, 800); // matches the CSS transition (0.8s)
   }, 2500); // splash stays for 2.5 seconds
 });
