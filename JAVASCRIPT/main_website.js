@@ -5,6 +5,7 @@
 // ingredients coverage counts only pantry items with qty > 0.
 // Added: Hover/tilt motion on recipe cards.
 // Added: Database recipe deletion.
+// Added: Database ingredient and pantry management.
 
 /* ----------------- Utilities ----------------- */
 const qs = (sel, ctx = document) => ctx.querySelector(sel);
@@ -228,6 +229,248 @@ function persist() {
   setLS(MH_NOTIF_KEY, state.notifications);
   setLS("mh_metric", state.settings.metric);
   setLS("mh_theme", state.settings.theme);
+}
+
+/* ----------------- Ingredient & Pantry Management ----------------- */
+async function initializeIngredientSystem() {
+  console.log("🔄 Initializing ingredient system...");
+
+  try {
+    // Load ingredients
+    if (window.loadIngredients) {
+      await window.loadIngredients();
+    } else {
+      console.warn("⚠️ window.loadIngredients not available");
+    }
+
+    // Load pantry items
+    if (window.loadPantryItems) {
+      await window.loadPantryItems();
+    } else {
+      console.warn("⚠️ window.loadPantryItems not available");
+    }
+
+    // Populate pantry state
+    if (window.populatePantryState) {
+      window.populatePantryState();
+    } else {
+      console.warn("⚠️ window.populatePantryState not available");
+    }
+
+    // Setup ingredient select in pantry modal
+    const ingredientSelect = document.getElementById("ingredientSelect");
+    if (ingredientSelect && window.populateIngredientSelect) {
+      window.populateIngredientSelect(ingredientSelect);
+    }
+
+    console.log("✅ Ingredient system initialized");
+  } catch (error) {
+    console.error("❌ Failed to initialize ingredient system:", error);
+  }
+}
+
+function setupPantryForm() {
+  const pantryForm = document.getElementById("pantryForm");
+  const ingredientSelect = document.getElementById("ingredientSelect");
+  const newIngredientBtn = document.getElementById("newIngredientBtn");
+  const ingredientDialog = document.getElementById("ingredientDialog");
+  const ingredientForm = document.getElementById("ingredientForm");
+  const ingredientCancelBtn = document.getElementById("ingredientCancelBtn");
+
+  // New ingredient button
+  if (newIngredientBtn) {
+    newIngredientBtn.addEventListener("click", () => {
+      if (ingredientDialog) {
+        ingredientDialog.showModal();
+      } else {
+        console.error("❌ Ingredient dialog not found");
+      }
+    });
+  }
+
+  // Ingredient form submission
+  if (ingredientForm) {
+    ingredientForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(ingredientForm);
+      const ingredientData = {
+        name: formData.get("name"),
+        category: formData.get("category"),
+        unit: formData.get("unit_of_measurement"),
+        shelf_life: formData.get("shelf_life_days"),
+        barcode: formData.get("barcode"),
+      };
+
+      try {
+        if (!window.createIngredient) {
+          throw new Error("Ingredient creation not available");
+        }
+
+        const result = await window.createIngredient(ingredientData);
+
+        if (result.success) {
+          // Add new ingredient to select
+          if (ingredientSelect) {
+            const option = document.createElement("option");
+            option.value = result.ingredient_id;
+            option.textContent = result.ingredient_name;
+            if (ingredientData.category) {
+              option.textContent += ` (${ingredientData.category})`;
+            }
+            ingredientSelect.appendChild(option);
+            ingredientSelect.value = result.ingredient_id;
+
+            // Also update the ingredient name field
+            const ingredientNameInput = document.querySelector(
+              'input[name="ingredient_name"]'
+            );
+            if (ingredientNameInput) {
+              ingredientNameInput.value = result.ingredient_name;
+            }
+          }
+
+          ingredientDialog.close();
+          alert("Ingredient created successfully!");
+        }
+      } catch (error) {
+        console.error("Error creating ingredient:", error);
+        alert("Error creating ingredient: " + error.message);
+      }
+    });
+  }
+
+  // Ingredient cancel button - FIXED NULL REFERENCE
+  if (ingredientCancelBtn) {
+    ingredientCancelBtn.addEventListener("click", () => {
+      if (ingredientDialog) {
+        ingredientDialog.close();
+      }
+    });
+  }
+
+  // Update ingredient name when select changes
+  if (ingredientSelect) {
+    ingredientSelect.addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const ingredientNameInput = document.querySelector(
+        'input[name="ingredient_name"]'
+      );
+      if (ingredientNameInput && selectedOption.textContent) {
+        // Extract just the name without category
+        const name = selectedOption.textContent.split(" (")[0];
+        ingredientNameInput.value = name;
+      }
+    });
+  }
+
+  // Update pantry form submission - FIXED UNDEFINED ERROR
+  // Update pantry form submission - FIXED VERSION
+  if (pantryForm) {
+    pantryForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(pantryForm);
+
+      // Debug: log all form data
+      console.log("📋 Form data entries:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}: ${value}`);
+      }
+
+      console.log("🔄 Submitting pantry data:", pantryData);
+
+      // Validate required fields
+      if (!pantryData.ingredient_id || pantryData.ingredient_id === "") {
+        alert("Please select an ingredient");
+        return;
+      }
+
+      if (!pantryData.quantity || parseFloat(pantryData.quantity) <= 0) {
+        alert("Please enter a valid quantity");
+        return;
+      }
+
+      if (!pantryData.purchase_date) {
+        alert("Please select a purchase date");
+        return;
+      }
+
+      try {
+        if (!window.createPantryItem) {
+          throw new Error("Pantry item creation not available");
+        }
+
+        const result = await window.createPantryItem(pantryData);
+
+        if (result.success) {
+          const pantryDialog = document.getElementById("pantryDialog");
+          if (pantryDialog) {
+            pantryDialog.close();
+          }
+          alert("Pantry item added successfully!");
+
+          // Reload everything
+          await initializeIngredientSystem();
+          if (window.render) {
+            window.render();
+          }
+        } else {
+          throw new Error(result.error || "Failed to create pantry item");
+        }
+      } catch (error) {
+        console.error("Error adding pantry item:", error);
+        alert("Error adding pantry item: " + error.message);
+      }
+    });
+  }
+}
+
+/* FIXED: Pantry Dialog Function */
+function openPantryDialog(item = null) {
+  const dlg = document.getElementById("pantryDialog");
+  const form = document.getElementById("pantryForm");
+
+  if (!dlg || !form) {
+    console.error("❌ Pantry dialog or form not found");
+    return;
+  }
+
+  form.reset();
+  delete form.dataset.editId;
+
+  // Populate ingredient select if available
+  const ingredientSelect = document.getElementById("ingredientSelect");
+  if (ingredientSelect && window.populateIngredientSelect) {
+    window.populateIngredientSelect(ingredientSelect);
+  }
+
+  if (item) {
+    // For editing existing items
+    const nameInput = form.querySelector('input[name="ingredient_name"]');
+    const qtyInput = form.querySelector('input[name="quantity"]');
+    const expiryInput = form.querySelector('input[name="expiry_date"]');
+    const categorySelect = form.querySelector('select[name="category"]');
+
+    if (nameInput) nameInput.value = item.name || "";
+    if (qtyInput) qtyInput.value = item.qty ?? 1;
+    if (expiryInput) expiryInput.value = item.expiry || "";
+    if (categorySelect) categorySelect.value = item.category || "";
+
+    form.dataset.editId = item.id;
+  }
+
+  // FIXED: Remove the problematic onclick assignment
+  const cancelButton = form.querySelector(".btn-secondary");
+  if (cancelButton) {
+    // Replace the inline onclick with event listener
+    cancelButton.onclick = null; // Clear existing
+    cancelButton.addEventListener("click", function () {
+      dlg.close();
+    });
+  }
+
+  dlg.showModal();
 }
 
 /* ----------------- View Switching ----------------- */
@@ -1225,6 +1468,13 @@ function openPantryDialog(item = null) {
   const form = qs("#pantryForm");
   form.reset();
   delete form.dataset.editId;
+
+  // Populate ingredient select if available
+  const ingredientSelect = document.getElementById("ingredientSelect");
+  if (ingredientSelect && window.populateIngredientSelect) {
+    window.populateIngredientSelect(ingredientSelect);
+  }
+
   if (item) {
     form.name.value = item.name || "";
     form.qty.value = item.qty ?? 1;
@@ -1415,6 +1665,58 @@ window.render = render;
 window.renderRecipes = renderRecipes;
 window.renderHome = renderHome;
 
-// Init
-setupPantryChips();
-render();
+// Initialize ingredient system when DOM is loaded
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("🏠 DOM Content Loaded - initializing systems");
+
+  // Initialize ingredient and pantry system
+  await initializeIngredientSystem();
+  setupPantryForm();
+
+  // Existing initialization
+  setupPantryChips();
+  render();
+});
+
+// Load database recipes when the script loads
+setTimeout(async () => {
+  console.log("⏰ Timeout elapsed, loading recipes...");
+  if (window.refreshRecipesFromDatabase) {
+    await window.refreshRecipesFromDatabase();
+  }
+}, 500);
+// Handle pantry form submission
+document
+  .getElementById("pantryForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
+    console.log("📝 Pantry form submitted");
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+
+    console.log("Form data:", data);
+
+    try {
+      await createPantryItem(data);
+      // Close the dialog
+      document.getElementById("pantryDialog").close();
+      // Reset the form
+      this.reset();
+    } catch (error) {
+      console.error("Failed to create pantry item:", error);
+      alert("Failed to create pantry item: " + error.message);
+    }
+  });
+
+// Handle cancel button
+document
+  .getElementById("pantryCancelBtn")
+  .addEventListener("click", function () {
+    document.getElementById("pantryDialog").close();
+  });
+
+// Handle add pantry button
+document.getElementById("addPantryBtn").addEventListener("click", function () {
+  document.getElementById("pantryDialog").showModal();
+});

@@ -12,6 +12,7 @@
     />
     <link rel="stylesheet" href="../CSS/main_website.css" />
     <link rel="stylesheet" href="../CSS/recipe_modal.css" />
+    <link rel="stylesheet" href="../CSS/pantry_modal.css" />
   </head>
   <body>
     <!-- Top Navigation -->
@@ -207,24 +208,6 @@
           <h2>Pantry</h2>
           <div class="toolbar-actions">
             <button id="addPantryBtn" class="btn primary">+ Add Item</button>
-            <select
-              id="pantryCategoryFilter"
-              class="input"
-              aria-label="Filter pantry by category"
-            >
-              <option value="all">All categories</option>
-              <option>Meat & Poultry</option>
-              <option>Seafood</option>
-              <option>Dairy & Eggs</option>
-              <option>Veg</option>
-              <option>Fruits</option>
-              <option>Grains & Pasta</option>
-              <option>Canned & Jarred Goods</option>
-              <option>Condiments & Sauces</option>
-              <option>Baking & Spices</option>
-              <option>Snacks & Treats</option>
-              <option>Beverages</option>
-            </select>
             <input
               id="pantrySearch"
               class="input"
@@ -369,51 +352,59 @@
     </main>
 
     <!-- DIALOGS -->
-    <dialog id="pantryDialog" class="modal">
-      <form method="dialog" class="modal-body" id="pantryForm">
-        <h3>Add Pantry Item</h3>
-        <div class="form-grid">
-          <label>Item <input name="name" required /></label>
-          <label
-            >Quantity
-            <input type="number" name="qty" min="0" step="1" value="1" required
-          /></label>
-          <label
-            >Unit
-            <select name="unit">
-              <option>pcs</option>
-              <option>g</option>
-              <option>kg</option>
-              <option>ml</option>
-              <option>l</option>
-            </select>
-          </label>
-          <label>Expiry <input type="date" name="expiry" /></label>
-          <label
-            >Category
-            <select name="category" required>
-              <option>Meat & Poultry</option>
-              <option>Seafood</option>
-              <option>Dairy & Eggs</option>
-              <option>Veg</option>
-              <option>Fruits</option>
-              <option>Grains & Pasta</option>
-              <option>Canned & Jarred Goods</option>
-              <option>Condiments & Sauces</option>
-              <option>Baking & Spices</option>
-              <option>Snacks & Treats</option>
-              <option>Beverages</option>
-            </select>
-          </label>
-        </div>
-        <div class="modal-actions" role="toolbar">
-          <button class="btn" type="submit" value="cancel">Cancel</button>
-          <button class="btn primary" type="submit" value="default">
-            Save
-          </button>
-        </div>
-      </form>
-    </dialog>
+    <!-- PANTRY ADD ITEM DIALOG -->
+   <dialog id="pantryDialog" class="modal">
+  <form id="pantryForm" class="modal-body" method="POST">
+    <h3>Add Pantry Item</h3>
+
+    <div class="form-grid">
+      <label>
+        Select Ingredient
+        <select id="ingredientSelect" name="ingredient_id" required>
+          <option value="">Select an ingredient...</option>
+        </select>
+        <button type="button" id="newIngredientBtn" class="btn link" style="margin-top: 5px">
+          + Add New Ingredient
+        </button>
+      </label>
+
+      <label>
+        Ingredient Name
+        <input type="text" id="ingredientNameInput" name="ingredient_name" required readonly />
+      </label>
+
+      <label>
+        Quantity
+        <input type="number" name="quantity" step="0.01" min="0" required />
+      </label>
+
+      <label>
+        Purchase Date
+        <input type="date" name="purchase_date" required />
+      </label>
+
+      <label>
+        Expiry Date
+        <input type="date" name="expiry_date" />
+      </label>
+
+      <label>
+        Barcode (optional)
+        <input type="text" name="barcode" placeholder="e.g. 123456789" />
+      </label>
+
+      <label>
+        Location in Pantry
+        <input type="text" name="location_in_pantry" placeholder="e.g. Fridge, Top Shelf" />
+      </label>
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" id="pantryCancelBtn" class="btn btn-secondary">Cancel</button>
+    </div>
+  </form>
+</dialog>
 
     <!-- Recipe Create Modal -->
     <dialog id="recipeDialog" class="modal">
@@ -563,15 +554,94 @@
         </div>
       </div>
     </dialog>
+    <!-- Ingredient Creation Modal -->
+    <dialog id="ingredientDialog" class="modal">
+      <form id="ingredientForm" class="modal-body">
+        <h3>Create New Ingredient</h3>
+
+        <div class="form-grid">
+          <label>
+            Ingredient Name *
+            <input type="text" id="ingredientName" name="name" required />
+          </label>
+
+          <label>
+            Category
+            <select id="ingredientCategory" name="category">
+              <option value="">Select category...</option>
+              <option>Meat & Poultry</option>
+              <option>Seafood</option>
+              <option>Dairy & Eggs</option>
+              <option>Veg</option>
+              <option>Fruits</option>
+              <option>Grains & Pasta</option>
+              <option>Canned & Jarred Goods</option>
+              <option>Condiments & Sauces</option>
+              <option>Baking & Spices</option>
+              <option>Snacks & Treats</option>
+              <option>Beverages</option>
+            </select>
+          </label>
+
+          <label>
+            Default Unit
+            <select id="ingredientUnit" name="unit_of_measurement">
+              <option value="">Select unit...</option>
+              <option value="pcs">Pieces</option>
+              <option value="g">Grams</option>
+              <option value="kg">Kilograms</option>
+              <option value="ml">Milliliters</option>
+              <option value="l">Liters</option>
+              <option value="cup">Cups</option>
+              <option value="tsp">Teaspoons</option>
+              <option value="tbsp">Tablespoons</option>
+            </select>
+          </label>
+
+          <label>
+            Shelf Life (days)
+            <input
+              type="number"
+              id="ingredientShelfLife"
+              name="shelf_life_days"
+              min="0"
+              step="1"
+            />
+          </label>
+
+          <label>
+            Barcode (optional)
+            <input
+              type="text"
+              id="ingredientBarcode"
+              name="barcode"
+              placeholder="e.g. 123456789"
+            />
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Create Ingredient</button>
+          <button type="button" id="ingredientCancelBtn" class="btn">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </dialog>
 
     <!-- manage user sessions -->
-    <script src="../JAVASCRIPT/session-handler.js"></script>
+<!-- ... existing code ... -->
 
+    <!-- Add these scripts BEFORE main_website.js -->
+    <script src="../JAVASCRIPT/database_ingredients.js"></script>
+    <script src="../JAVASCRIPT/database_pantry.js"></script>
+    <script src="../JAVASCRIPT/database_recipes.js"></script>
+    
+    <!-- Existing scripts -->
+    <script src="../JAVASCRIPT/session-handler.js"></script>
     <script src="../JAVASCRIPT/main_website.js"></script>
     <script src="../JAVASCRIPT/create_recipe.js"></script>
-    <script src="../JAVASCRIPT/database_recipes.js"></script>
-    <!-- This should come after main_website.js -->
-    <script src="../JAVASCRIPT/database_recipes.js"></script>
-    <!-- Add this line -->
+</body>
+</html>
   </body>
 </html>
