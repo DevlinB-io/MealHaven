@@ -1685,29 +1685,6 @@ setTimeout(async () => {
     await window.refreshRecipesFromDatabase();
   }
 }, 500);
-// Handle pantry form submission
-document
-  .getElementById("pantryForm")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault();
-    console.log("📝 Pantry form submitted");
-
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData);
-
-    console.log("Form data:", data);
-
-    try {
-      await createPantryItem(data);
-      // Close the dialog
-      document.getElementById("pantryDialog").close();
-      // Reset the form
-      this.reset();
-    } catch (error) {
-      console.error("Failed to create pantry item:", error);
-      alert("Failed to create pantry item: " + error.message);
-    }
-  });
 
 // Handle cancel button
 document
