@@ -205,6 +205,7 @@ const defaultNotifs = [
 /* ----------------- App State ----------------- */
 const state = {
   recipes: getLS("mh_recipes", SAMPLE_RECIPES),
+  recipes: getLS("mh_recipes", SAMPLE_RECIPES),
   pantry: getLS("mh_pantry", SAMPLE_PANTRY),
   plans: getLS("mh_plans", SAMPLE_PLANS),
   favs: getLS("mh_favs", SAMPLE_FAVS),
@@ -214,7 +215,19 @@ const state = {
   prefs: getLS(MH_PREFS_KEY, defaultPrefs),
   notifications: getLS(MH_NOTIF_KEY, defaultNotifs),
 };
+// Add this function to merge database recipes:
+function mergeDatabaseRecipes(databaseRecipes) {
+  // Remove any existing database recipes to avoid duplicates
+  const nonDbRecipes = state.recipes.filter((r) => !r.id.startsWith("db_"));
 
+  // Combine with new database recipes
+  state.recipes = [...nonDbRecipes, ...databaseRecipes];
+  persist();
+}
+
+// Make it available globally
+window.mergeDatabaseRecipes = mergeDatabaseRecipes;
+window.state = state; // Ensure state is globally accessible
 /* ----------------- Persistence ----------------- */
 function persist() {
   setLS("mh_recipes", state.recipes);

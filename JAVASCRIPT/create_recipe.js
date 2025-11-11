@@ -1,23 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Helper: query selector
   const qs = (sel) => document.querySelector(sel);
-
-  // Elements
   const recipeDialog = qs("#recipeDialog");
   const recipeForm = qs("#recipeForm");
   const recipeCancel = qs("#recipeCancelBtn");
   const createBtn = qs("#createRecipeBtn");
 
-  // Open modal
   createBtn?.addEventListener("click", () => {
     recipeForm.reset();
     recipeDialog.showModal();
   });
 
-  // Close modal
   recipeCancel?.addEventListener("click", () => recipeDialog.close());
 
-  // Parse ingredients list
   function parseList(text, splitter = /[\n,;]+/) {
     return (text || "")
       .split(splitter)
@@ -25,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
   }
 
-  // Submit recipe
   recipeForm?.addEventListener("submit", async (ev) => {
     ev.preventDefault();
 
@@ -46,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Prepare FormData for PHP
     const postData = new FormData();
     postData.append("name", name);
     postData.append("ingredients", ingredients.join("\n"));
@@ -68,17 +60,23 @@ document.addEventListener("DOMContentLoaded", () => {
         body: postData,
       });
 
-      // In create_recipe.js, update the success handler:
       if (res.ok) {
         alert("Recipe created successfully!");
 
         // Refresh recipes from database to include the new one
         if (typeof window.refreshRecipesFromDatabase === "function") {
           await window.refreshRecipesFromDatabase();
+        } else {
+          console.warn("refreshRecipesFromDatabase function not found");
+          // Fallback: reload the page
+          window.location.reload();
         }
 
         recipeForm.reset();
         recipeDialog.close();
+      } else {
+        // Handle HTTP errors (like 500, 404, etc.)
+        alert("Server error: Failed to create recipe");
       }
     } catch (err) {
       console.error("Error submitting recipe:", err);
