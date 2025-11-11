@@ -415,8 +415,15 @@
       </form>
     </dialog>
 
+    <!-- Recipe Create Modal -->
     <dialog id="recipeDialog" class="modal">
-      <form method="dialog" class="modal-body" id="recipeForm">
+      <form
+        id="recipeForm"
+        class="modal-body"
+        method="POST"
+        action="../PHP/create_recipe.php"
+        enctype="multipart/form-data"
+      >
         <h3>Create Recipe</h3>
         <div class="form-grid">
           <label>
@@ -509,9 +516,9 @@
           </label>
         </div>
 
-        <div class="modal-actions" role="toolbar">
-          <button class="btn" type="button" id="recipeCancelBtn">Cancel</button>
-          <button class="btn primary" type="submit">Save</button>
+        <div class="modal-actions">
+          <button type="button" id="recipeCancelBtn" class="btn">Cancel</button>
+          <button type="submit" class="btn primary">Save</button>
         </div>
       </form>
     </dialog>
@@ -562,5 +569,7 @@
 
     <script src="../JAVASCRIPT/main_website.js"></script>
     <script src="../JAVASCRIPT/create_recipe.js"></script>
+    <script src="../JAVASCRIPT/database_recipes.js"></script>
+    <!-- Add this line -->
   </body>
 </html>
