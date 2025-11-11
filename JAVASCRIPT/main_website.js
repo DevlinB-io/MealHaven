@@ -4,6 +4,7 @@
 // Updated for: Pantry Recipes grouping; qty "-" never removes (keeps at 0);
 // ingredients coverage counts only pantry items with qty > 0.
 // Added: Hover/tilt motion on recipe cards.
+// Added: Database recipe deletion.
 
 /* ----------------- Utilities ----------------- */
 const qs = (sel, ctx = document) => ctx.querySelector(sel);
@@ -205,7 +206,6 @@ const defaultNotifs = [
 /* ----------------- App State ----------------- */
 const state = {
   recipes: getLS("mh_recipes", SAMPLE_RECIPES),
-  recipes: getLS("mh_recipes", SAMPLE_RECIPES),
   pantry: getLS("mh_pantry", SAMPLE_PANTRY),
   plans: getLS("mh_plans", SAMPLE_PLANS),
   favs: getLS("mh_favs", SAMPLE_FAVS),
@@ -215,19 +215,7 @@ const state = {
   prefs: getLS(MH_PREFS_KEY, defaultPrefs),
   notifications: getLS(MH_NOTIF_KEY, defaultNotifs),
 };
-// Add this function to merge database recipes:
-function mergeDatabaseRecipes(databaseRecipes) {
-  // Remove any existing database recipes to avoid duplicates
-  const nonDbRecipes = state.recipes.filter((r) => !r.id.startsWith("db_"));
 
-  // Combine with new database recipes
-  state.recipes = [...nonDbRecipes, ...databaseRecipes];
-  persist();
-}
-
-// Make it available globally
-window.mergeDatabaseRecipes = mergeDatabaseRecipes;
-window.state = state; // Ensure state is globally accessible
 /* ----------------- Persistence ----------------- */
 function persist() {
   setLS("mh_recipes", state.recipes);
@@ -515,7 +503,7 @@ function renderTrending() {
       .join("") || "<p>No recipes yet.</p>";
   hookRecipeButtons(wrap);
   hookIngredientChecks(wrap);
-  hookRecipeHoverMotion(wrap); // <-- added
+  hookRecipeHoverMotion(wrap);
 }
 function renderExpiringSoon() {
   const ul = qs("#expiringList");
@@ -787,7 +775,7 @@ function openRemoveIngredientDialog(ingredientName, checkboxEl) {
   const dlg = qs("#removeIngredientDialog");
   qs(
     "#removeIngText"
-  ).textContent = `Remove “${ingredientName}” from your pantry?`;
+  ).textContent = `Remove "${ingredientName}" from your pantry?`;
   const onClose = () => {
     if (dlg.returnValue === "cancel" && checkboxEl) checkboxEl.checked = true;
     dlg.removeEventListener("close", onClose);
@@ -913,46 +901,129 @@ function hookRecipeButtons(scope = document) {
       });
     });
 
-  // delete custom recipe (and clean up everywhere)
+  // === UPDATED DELETE HANDLER FOR DATABASE ===
   scope
     .querySelectorAll('.recipe .actions [data-action="delete"]')
     .forEach((btn) => {
       if (btn.dataset.bound) return;
       btn.dataset.bound = "1";
-      btn.addEventListener("click", (e) => {
-        const card = e.target.closest(".recipe");
-        const id = card.dataset.id;
-        const recipe = state.recipes.find((r) => r.id === id);
-        if (!recipe) return;
-        if (
-          !confirm(
-            `Delete "${recipe.title}"? This will also remove it from your meal plan and favourites.`
-          )
-        )
-          return;
+      btn.addEventListener("click", async function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        // Remove from recipes
-        state.recipes = state.recipes.filter((r) => r.id !== id);
-        // Remove from favourites
-        state.favs = state.favs.filter((fid) => fid !== id);
-        // Remove from all planned dates
-        for (const dateKey of Object.keys(state.plans)) {
-          state.plans[dateKey] = (state.plans[dateKey] || []).filter(
-            (ev) => ev.id !== id
-          );
-          if (!state.plans[dateKey].length) delete state.plans[dateKey];
+        const card = this.closest(".recipe");
+        const recipeId = card.dataset.id;
+        const recipe = state.recipes.find((r) => r.id === recipeId);
+
+        if (!recipe) {
+          console.error("Recipe not found:", recipeId);
+          alert("Recipe not found!");
+          return;
         }
 
-        persist();
+        console.log("Delete clicked for:", recipe.title, "ID:", recipeId);
 
-        if (typeof MHNotify === "function")
-          MHNotify("Recipe deleted", `"${recipe.title}" was removed.`);
+        if (
+          !confirm(
+            `Are you sure you want to delete "${recipe.title}"? This will also remove it from your meal plan and favourites.`
+          )
+        ) {
+          return;
+        }
 
-        // Re-render affected views
-        renderHome();
-        renderRecipes();
-        renderFavourites();
-        renderCalendar();
+        try {
+          // Show loading state
+          const originalText = this.textContent;
+          this.textContent = "Deleting...";
+          this.disabled = true;
+
+          let databaseId = null;
+
+          // Check if this is a database recipe
+          if (recipeId.startsWith("db_")) {
+            databaseId = recipe.db_id;
+            console.log("Deleting database recipe with ID:", databaseId);
+
+            // Delete from database
+            const response = await fetch("../PHP/delete_recipe.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ recipe_id: databaseId }),
+            });
+
+            console.log("Delete response status:", response.status);
+
+            const result = await response.json();
+            console.log("Delete response:", result);
+
+            if (!response.ok || !result.success) {
+              throw new Error(result.error || "Failed to delete from database");
+            }
+
+            console.log("✅ Database deletion successful:", result.message);
+          } else {
+            console.log("Deleting sample recipe (local only):", recipeId);
+          }
+
+          // Remove from local state (always do this)
+          console.log("Removing from local state...");
+
+          // Remove from recipes array
+          state.recipes = state.recipes.filter((r) => r.id !== recipeId);
+          console.log("✅ Removed from recipes array");
+
+          // Remove from favourites
+          state.favs = state.favs.filter((favId) => favId !== recipeId);
+          console.log("✅ Removed from favourites");
+
+          // Remove from meal plans
+          let planCount = 0;
+          Object.keys(state.plans).forEach((date) => {
+            const before = state.plans[date].length;
+            state.plans[date] = state.plans[date].filter(
+              (plan) => plan.id !== recipeId
+            );
+            const after = state.plans[date].length;
+
+            if (before !== after) {
+              planCount += before - after;
+            }
+
+            if (state.plans[date].length === 0) {
+              delete state.plans[date];
+            }
+          });
+          console.log(`✅ Removed from ${planCount} meal plan entries`);
+
+          // Save to localStorage
+          persist();
+          console.log("💾 State persisted");
+
+          // Show success notification
+          if (typeof MHNotify === "function") {
+            MHNotify(
+              "Recipe Deleted",
+              `"${recipe.title}" was successfully deleted.`
+            );
+          }
+
+          // Re-render all views
+          renderHome();
+          renderRecipes();
+          renderFavourites();
+          renderCalendar();
+
+          console.log("✅ Delete process completed successfully!");
+        } catch (error) {
+          console.error("❌ Delete failed:", error);
+          alert(`Delete failed: ${error.message}`);
+
+          // Reset button
+          this.textContent = "Delete";
+          this.disabled = false;
+        }
       });
     });
 }
@@ -1028,27 +1099,7 @@ function renderRecipes() {
 
   hookRecipeButtons(list);
   hookIngredientChecks(list);
-  hookRecipeHoverMotion(list); // <-- added
-
-  // Show a small count badge on the Pantry Recipes button (fully complete)
-  if (groupCoverageBtn) {
-    const usable = new Set(
-      state.pantry
-        .filter((p) => (p.qty || 0) > 0)
-        .map((p) => (p.name || "").toLowerCase())
-    );
-    const fullCount = state.recipes.filter((r) =>
-      r.ingredients.every((i) => usable.has((i || "").toLowerCase()))
-    ).length;
-    const old = groupCoverageBtn.querySelector(".count");
-    if (old) old.remove();
-    const span = document.createElement("span");
-    span.className = "count";
-    span.style.marginLeft = "6px";
-    span.style.opacity = "0.8";
-    span.textContent = `(${fullCount})`;
-    groupCoverageBtn.appendChild(span);
-  }
+  hookRecipeHoverMotion(list);
 }
 
 /* Non-tab view switches */
@@ -1068,7 +1119,7 @@ function renderFavourites() {
     favs.map((r) => recipeCard(r, "")).join("") || "<p>No favourites yet.</p>";
   hookRecipeButtons(wrap);
   hookIngredientChecks(wrap);
-  hookRecipeHoverMotion(wrap); // <-- added
+  hookRecipeHoverMotion(wrap);
 }
 
 /* Planner (Calendar) */
@@ -1162,6 +1213,7 @@ function openPlanDialog(recipeId = null, dateKey = today(), editIndex = null) {
   };
   dlg.querySelector('button[value="cancel"]').onclick = () => dlg.close();
 }
+
 /* Pantry */
 function statusOf(p) {
   if (p.qty === 0) return "out";
@@ -1331,20 +1383,38 @@ function render() {
   renderPantry();
 }
 
+// Debug functions
+window.debugRecipeInfo = function (recipeId) {
+  const recipe = state.recipes.find((r) => r.id === recipeId);
+  if (!recipe) {
+    console.log("❌ Recipe not found:", recipeId);
+    return;
+  }
+
+  console.log("=== RECIPE DEBUG INFO ===");
+  console.log("Title:", recipe.title);
+  console.log("Frontend ID:", recipe.id);
+  console.log("Database ID:", recipe.db_id);
+  console.log("Is database recipe:", recipe.id.startsWith("db_"));
+  console.log("Full recipe object:", recipe);
+};
+
+window.listDatabaseRecipes = function () {
+  const dbRecipes = state.recipes.filter((r) => r.id.startsWith("db_"));
+  console.log("=== DATABASE RECIPES ===");
+  dbRecipes.forEach((recipe) => {
+    console.log(`- ${recipe.title} (ID: ${recipe.id}, DB: ${recipe.db_id})`);
+  });
+  console.log("Total:", dbRecipes.length);
+};
+
+// Expose functions to global scope
+window.state = state;
+window.persist = persist;
+window.render = render;
+window.renderRecipes = renderRecipes;
+window.renderHome = renderHome;
+
 // Init
 setupPantryChips();
 render();
-
-// Close dialogs with Esc
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    [
-      qs("#notifDialog"),
-      qs("#pantryDialog"),
-      qs("#recipeDialog"),
-      qs("#planDialog"),
-    ].forEach((d) => {
-      if (d && d.open) d.close();
-    });
-  }
-});

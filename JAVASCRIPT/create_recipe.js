@@ -1,17 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Helper: query selector
   const qs = (sel) => document.querySelector(sel);
+
+  // Elements
   const recipeDialog = qs("#recipeDialog");
   const recipeForm = qs("#recipeForm");
   const recipeCancel = qs("#recipeCancelBtn");
   const createBtn = qs("#createRecipeBtn");
 
+  // Open modal
   createBtn?.addEventListener("click", () => {
     recipeForm.reset();
     recipeDialog.showModal();
   });
 
+  // Close modal
   recipeCancel?.addEventListener("click", () => recipeDialog.close());
 
+  // Parse ingredients list
   function parseList(text, splitter = /[\n,;]+/) {
     return (text || "")
       .split(splitter)
@@ -19,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
   }
 
+  // Submit recipe
   recipeForm?.addEventListener("submit", async (ev) => {
     ev.preventDefault();
 
@@ -39,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Prepare FormData for PHP
     const postData = new FormData();
     postData.append("name", name);
     postData.append("ingredients", ingredients.join("\n"));

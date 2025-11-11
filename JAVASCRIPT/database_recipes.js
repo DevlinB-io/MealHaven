@@ -40,6 +40,7 @@ async function refreshRecipesFromDatabase() {
 
       return {
         id: `db_${recipe.id}`,
+        db_id: recipe.id, // ← CRUCIAL FOR DELETION
         image: recipe.image_path || getFallbackImage(recipe.category),
         title: recipe.name,
         minutes: totalTime,
@@ -48,7 +49,6 @@ async function refreshRecipesFromDatabase() {
         steps: steps,
         custom: true,
         // Keep database fields for reference
-        db_id: recipe.id,
         calories: recipe.calories,
         serving_size: recipe.serving_size,
         difficulty: recipe.difficulty,
