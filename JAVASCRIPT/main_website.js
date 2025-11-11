@@ -1523,7 +1523,8 @@ function renderPantry() {
   const html = rows
     .map(
       (p) => `
-    <tr data-id="${p.id}">
+    <tr data-id="${p.id}" data-db_id="${p.db_id || ""}">
+
       <td>${p.name}</td>
       <td>
         <div class="qty-wrap">
@@ -1569,11 +1570,28 @@ function renderPantry() {
 
   // Delete/Edit
   tbody.querySelectorAll('[data-act="del"]').forEach((b) =>
-    b.addEventListener("click", (e) => {
-      const id = e.target.closest("tr").dataset.id;
-      state.pantry = state.pantry.filter((p) => p.id !== id);
-      persist();
-      render();
+    b.addEventListener("click", async (e) => {
+      const tr = e.target.closest("tr");
+      const pantryId = tr.dataset.db_id || tr.dataset.id; // support DB ID if available
+
+      if (!confirm("Are you sure you want to delete this pantry item?")) return;
+
+      try {
+        if (window.deletePantryItem) {
+          const result = await window.deletePantryItem(pantryId);
+          if (result.success) {
+            alert("Pantry item deleted!");
+            render();
+          } else {
+            alert("Failed to delete pantry item: " + result.error);
+          }
+        } else {
+          console.error("deletePantryItem not found");
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert("Error deleting pantry item: " + error.message);
+      }
     })
   );
   tbody.querySelectorAll('[data-act="edit"]').forEach((b) =>

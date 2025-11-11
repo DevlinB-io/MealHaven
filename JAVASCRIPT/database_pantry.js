@@ -49,6 +49,35 @@ async function createPantryItem(pantryData) {
     throw error;
   }
 }
+async function deletePantryItem(pantryId) {
+  console.log("🗑️ Deleting pantry item ID:", pantryId);
+
+  try {
+    const formData = new FormData();
+    formData.append("pantry_id", pantryId); // must match PHP
+
+    const response = await fetch("../PHP/delete_pantry_item.php", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log("📨 Delete pantry item response:", result);
+
+    if (result.success) {
+      await loadPantryItems();
+      return result;
+    } else {
+      throw new Error(result.error || "Failed to delete pantry item");
+    }
+  } catch (error) {
+    console.error("💥 Error deleting pantry item:", error);
+    alert("Error deleting pantry item: " + error.message);
+  }
+}
+window.deletePantryItem = deletePantryItem;
+
+window.deletePantryItem = deletePantryItem;
 
 function populatePantryState() {
   if (!window.state || !window.state.pantry) {
