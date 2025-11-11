@@ -3,84 +3,254 @@
 // connect to database
 require_once '../DATABASE/database_connection.php';
 
+// check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
     // get form data
-    $name = trim($_POST['name']);
-    $description = trim($_POST['description'] ?? '');
-    $instructions = trim($_POST['instructions']);
-    $difficulty = $_POST['difficulty'] ?? 'EASY';
-    $prep_time = intval($_POST['prep_time'] ?? 0);
-    $cook_time = intval($_POST['cook_time'] ?? 0);
-    $calories = floatval($_POST['calories'] ?? 0);
-    $serving_size = intval($_POST['serving_size'] ?? 1);
-    $category = trim($_POST['category'] ?? 'Mixed Dishes/Meals');
-    $ingredients = trim($_POST['ingredients'] ?? '');
-    $user_id = $_POST['user_id'] ?? null; // optional if logged in
+    $first_name = trim($_POST['first_name']);
+    $last_name = trim($_POST['last_name']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
+    $password = trim($_POST['password']);
+    $confirm_password = trim($_POST['confirm_password']);
 
-    // validate required fields
-    if (!$name || !$instructions || !$ingredients) {
-        showErrorPage("Please fill in name, ingredients, and instructions.");
+    // check all fields filled
+    if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
+        showErrorPage("All required fields must be filled out.");
     }
 
-    // handle image upload
-    $imagePath = null;
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        $newName = uniqid('recipe_', true) . '.' . $ext;
-        $uploadDir = '../IMAGES/recipes/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-        $targetPath = $uploadDir . $newName;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-            $imagePath = $targetPath;
-        }
+    // check passwords match
+    if ($password !== $confirm_password) {
+        showErrorPage("Passwords do not match.");
     }
+
+    // check if email already exists
+    $checkEmail = $database_connection->prepare("SELECT USER_EMAIL_ADDRESS FROM USER WHERE USER_EMAIL_ADDRESS = ?");
+
+    // bind email
+    $checkEmail->bind_param("s", $email);
+
+    // run query
+    $checkEmail->execute();
+
+    // store results
+    $checkEmail->store_result();
+
+    // check if email found
+    if ($checkEmail->num_rows() > 0) {
+        showErrorPage("This email is already registered. Please log in instead.");
+    }
+
+    // hash password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // prepare insert query
     $stmt = $database_connection->prepare("
-        INSERT INTO RECIPE
-        (RECIPE_NAME, RECIPE_DESCRIPTION, RECIPE_INSTRUCTIONS, RECIPE_DIFFICULTY_LEVEL, RECIPE_PREP_TIME_MINUTES, RECIPE_COOKING_TIME_MINUTES, CALORIES, SERVING_SIZE, RECIPE_IMAGE, CATEGORY, INGREDIENTS, USER_ID)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
+    INSERT INTO USER
+    (USER_FIRST_NAME, USER_LAST_NAME, USER_EMAIL_ADDRESS, USER_PHONE_NUMBER, PASSWORD)
+    VALUES (?, ?, ?, ?, ?)");
 
-    $stmt->bind_param(
-        "ssssiiddsssi",
-        $name,
-        $description,
-        $instructions,
-        $difficulty,
-        $prep_time,
-        $cook_time,
-        $calories,
-        $serving_size,
-        $imagePath,
-        $category,
-        $ingredients,
-        $user_id
-    );
+    // bind all values
+    $stmt->bind_param("sssss", $first_name, $last_name, $email, $phone, $hashed_password);
 
+    // save user to database
     if ($stmt->execute()) {
-        showSuccessPage("Recipe \"$name\" created successfully!");
-    } else {
-        showErrorPage("Database error: " . $stmt->error);
-    }
+        // start session
+        session_start();
 
+        // get new user id
+        $newUserId = $database_connection->insert_id;
+
+        // store user id in session
+        $_SESSION['user_id'] = $newUserId;
+
+        // show success message and redirect
+        showSuccessPage("Account created successfully! Redirecting to your dashboard...");
+    } else {
+        // show error
+        showErrorPage("Error creating account: " . $stmt->error);
+    }
+    // close statements
     $stmt->close();
+    $checkEmail->close();
+
+    // close connection
     $database_connection->close();
 }
 
-// ----------------------
-// HTML templates
-// ----------------------
 function showErrorPage($message)
 {
-    echo "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Error</title></head><body><h1>Error</h1><p>" . htmlspecialchars($message) . "</p><a href='../HTML/main_website.html'>Back</a></body></html>";
+    // Rgistration failure card
+    echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="3;url=../HTML/main_website.html">
+<title>Registration Failed - MealHaven</title>
+<style>
+    body {
+        font-family: "Inter", system-ui, sans-serif;
+        background-color: #f1f5f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        padding: 50px 40px;
+        text-align: center;
+        width: 400px;
+        max-width: 90%;
+    }
+    .cross {
+        width: 90px;
+        height: 90px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        box-shadow: 0 4px 12px rgba(239,68,68,0.25);
+    }
+    .cross svg {
+        width: 45px;
+        height: 45px;
+        stroke: #ffffff;
+        stroke-width: 4;
+        fill: none;
+    }
+    h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+    p {
+        color: #64748b;
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+    a.btn {
+        display: inline-block;
+        background: #ef4444;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    a.btn:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+    }
+</style>
+</head>
+<body>
+    <div class="card">
+        <div class="cross">
+            <svg viewBox="0 0 24 24">
+                <path d="M6 6L18 18M6 18L18 6"></path>
+            </svg>
+        </div>
+        <h1>Registration Failed</h1>
+        <p>' . htmlspecialchars($message) . '</p>
+        <a href="../HTML/main_website.html" class="btn">Back to Sign Up</a>
+    </div>
+</body>
+</html>';
     exit();
 }
 
 function showSuccessPage($message)
 {
-    echo "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Success</title><meta http-equiv='refresh' content='3;url=../HTML/main_website.html'></head><body><h1>Success</h1><p>" . htmlspecialchars($message) . "</p><a href='../HTML/main_website.html'>Go to Recipes</a></body></html>";
+    // Registration success card
+    echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="3;url=../HTML/main_website.html">
+<title>Registration Successful - MealHaven</title>
+<style>
+    body {
+        font-family: "Inter", system-ui, sans-serif;
+        background-color: #f1f5f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        padding: 50px 40px;
+        text-align: center;
+        width: 400px;
+        max-width: 90%;
+    }
+    .checkmark {
+        width: 90px;
+        height: 90px;
+        background-color: #22c55e;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        box-shadow: 0 4px 12px rgba(34,197,94,0.25);
+    }
+    .checkmark svg {
+        width: 45px;
+        height: 45px;
+        stroke: #ffffff;
+        stroke-width: 4;
+        fill: none;
+    }
+    h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+    p {
+        color: #64748b;
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+    a.btn {
+        display: inline-block;
+        background: #22c55e;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    a.btn:hover {
+        background: #16a34a;
+        transform: translateY(-2px);
+    }
+</style>
+</head>
+<body>
+    <div class="card">
+        <div class="checkmark">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 6L9 17L4 12"></path>
+            </svg>
+        </div>
+        <h1>Registration Successful</h1>
+        <p>' . htmlspecialchars($message) . '</p>
+        <a href="../HTML/main_website.html" class="btn">Get Started</a>
+    </div>
+</body>
+</html>';
     exit();
 }
-?>
