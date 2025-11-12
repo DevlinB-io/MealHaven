@@ -1,8 +1,7 @@
-// database_recipes.js
 console.log("=== database_recipes.js LOADED ===");
 
 async function refreshRecipesFromDatabase() {
-  console.log("🔄 Starting refreshRecipesFromDatabase...");
+  console.log("Starting refreshRecipesFromDatabase...");
 
   try {
     const response = await fetch("../PHP/get_recipes.php");
@@ -17,15 +16,13 @@ async function refreshRecipesFromDatabase() {
     }
 
     const databaseRecipes = await response.json();
-    console.log("📊 Raw database recipes:", databaseRecipes);
+    console.log("Raw database recipes:", databaseRecipes);
 
-    // Check if we got an error response
     if (databaseRecipes.error) {
-      console.error("❌ Server error:", databaseRecipes.error);
+      console.error("Server error:", databaseRecipes.error);
       return [];
     }
 
-    // Transform database recipes to match your app's format
     const formattedRecipes = databaseRecipes.map((recipe) => {
       const ingredients = recipe.ingredients
         ? recipe.ingredients.split("\n").filter((i) => i.trim())
@@ -40,7 +37,7 @@ async function refreshRecipesFromDatabase() {
 
       return {
         id: `db_${recipe.id}`,
-        db_id: recipe.id, // ← CRUCIAL FOR DELETION
+        db_id: recipe.id,
         image: recipe.image_path || getFallbackImage(recipe.category),
         title: recipe.name,
         minutes: totalTime,
@@ -48,55 +45,46 @@ async function refreshRecipesFromDatabase() {
         ingredients: ingredients,
         steps: steps,
         custom: true,
-        // Keep database fields for reference
         calories: recipe.calories,
         serving_size: recipe.serving_size,
         difficulty: recipe.difficulty,
       };
     });
 
-    console.log("🎨 Formatted recipes:", formattedRecipes);
+    console.log("Formatted recipes:", formattedRecipes);
 
-    // Update state with database recipes
     if (window.state && window.state.recipes) {
-      console.log(
-        "📝 Current state recipes before merge:",
-        window.state.recipes
-      );
+      console.log("Current state recipes before merge:", window.state.recipes);
 
-      // Remove any existing database recipes to avoid duplicates
       const nonDbRecipes = window.state.recipes.filter(
         (r) => !r.id.startsWith("db_")
       );
-      console.log("🗑️ Non-db recipes to keep:", nonDbRecipes);
+      console.log("Non-db recipes to keep:", nonDbRecipes);
 
-      // Combine non-db recipes with new database recipes
       window.state.recipes = [...nonDbRecipes, ...formattedRecipes];
-      console.log("✅ Final merged recipes:", window.state.recipes);
+      console.log("Final merged recipes:", window.state.recipes);
 
-      // Persist to localStorage
       if (window.persist) {
         window.persist();
-        console.log("💾 Persisted to localStorage");
+        console.log("Persisted to localStorage");
       }
 
-      // Trigger re-render
       if (window.render) {
-        console.log("🎬 Calling window.render()");
+        console.log("Calling window.render()");
         window.render();
       } else if (window.renderRecipes) {
-        console.log("🎬 Calling window.renderRecipes()");
+        console.log("Calling window.renderRecipes()");
         window.renderRecipes();
       } else {
-        console.warn("⚠️ No render function found!");
+        console.warn("No render function found!");
       }
     } else {
-      console.error("❌ window.state not available!");
+      console.error("window.state not available!");
     }
 
     return formattedRecipes;
   } catch (error) {
-    console.error("💥 Error refreshing recipes from database:", error);
+    console.error("Error refreshing recipes from database:", error);
     return [];
   }
 }
@@ -115,17 +103,14 @@ function getFallbackImage(category) {
   return fallbackImages[category] || "../IMAGES/placeholder.jpg";
 }
 
-// Make it available globally
 window.refreshRecipesFromDatabase = refreshRecipesFromDatabase;
-console.log("🌐 refreshRecipesFromDatabase added to window");
+console.log("refreshRecipesFromDatabase added to window");
 
-// Load database recipes when the script loads
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("🏠 DOM Content Loaded - starting database load");
+  console.log("DOM Content Loaded - starting database load");
 
-  // Wait for main_website.js to initialize
   setTimeout(async () => {
-    console.log("⏰ Timeout elapsed, loading recipes...");
+    console.log("Timeout elapsed, loading recipes...");
     await refreshRecipesFromDatabase();
   }, 500);
 });

@@ -1,4 +1,3 @@
-// Admin Dashboard JavaScript
 console.log("=== Admin Dashboard Loaded ===");
 
 class AdminDashboard {
@@ -10,7 +9,6 @@ class AdminDashboard {
   }
 
   async init() {
-    // Check if admin is logged in
     if (!this.checkAdminAuth()) {
       window.location.href = "admin_login.html";
       return;
@@ -24,34 +22,28 @@ class AdminDashboard {
   checkAdminAuth() {
     const isLoggedIn = localStorage.getItem("admin_logged_in") === "true";
     if (!isLoggedIn) {
-      // Also check session
       return false;
     }
     return true;
   }
 
   setupEventListeners() {
-    // Logout button
     document.getElementById("logoutBtn").addEventListener("click", () => {
       this.logout();
     });
 
-    // Refresh button
     document.getElementById("refreshBtn").addEventListener("click", () => {
       this.loadDashboardData();
     });
 
-    // Search functionality
     document.getElementById("userSearch").addEventListener("input", (e) => {
       this.filterUsers(e.target.value);
     });
 
-    // Export button
     document.getElementById("exportUsers").addEventListener("click", () => {
       this.exportUsersToCSV();
     });
 
-    // Delete modal buttons
     document.getElementById("cancelDelete").addEventListener("click", () => {
       document.getElementById("deleteUserModal").close();
     });
@@ -150,7 +142,6 @@ class AdminDashboard {
       tbody.appendChild(tr);
     });
   }
-
   filterUsers(searchTerm) {
     const filteredUsers = this.users.filter((user) => {
       const searchText = searchTerm.toLowerCase();
@@ -161,14 +152,11 @@ class AdminDashboard {
         user.USER_PHONE_NUMBER?.includes(searchTerm)
       );
     });
-
-    // Re-render with filtered users
     const originalUsers = this.users;
     this.users = filteredUsers;
     this.renderUsers();
-    this.users = originalUsers; // Restore original array
+    this.users = originalUsers;
   }
-
   deleteUser(userId, userName) {
     this.userToDelete = userId;
     document.getElementById(
@@ -176,10 +164,8 @@ class AdminDashboard {
     ).textContent = `Are you sure you want to delete user "${userName}"? This will permanently remove all their data including recipes, pantry items, and meal plans.`;
     document.getElementById("deleteUserModal").showModal();
   }
-
   async confirmDeleteUser() {
     if (!this.userToDelete) return;
-
     try {
       const response = await fetch("../PHP/delete_user.php", {
         method: "POST",
@@ -194,7 +180,7 @@ class AdminDashboard {
       if (result.success) {
         document.getElementById("deleteUserModal").close();
         this.showSuccess("User deleted successfully");
-        await this.loadDashboardData(); // Reload data
+        await this.loadDashboardData();
       } else {
         throw new Error(result.error || "Failed to delete user");
       }
@@ -205,7 +191,6 @@ class AdminDashboard {
 
     this.userToDelete = null;
   }
-
   exportUsersToCSV() {
     const headers = [
       "ID",
@@ -243,12 +228,10 @@ class AdminDashboard {
   }
 
   logout() {
-    // Clear admin session
     localStorage.removeItem("admin_logged_in");
     localStorage.removeItem("admin_user_id");
     localStorage.removeItem("admin_name");
 
-    // Clear any session data
     fetch("../PHP/admin_logout.php")
       .then(() => {
         window.location.href = "admin_login.html";
@@ -276,5 +259,4 @@ class AdminDashboard {
   }
 }
 
-// Initialize admin dashboard when page loads
 const adminDashboard = new AdminDashboard();

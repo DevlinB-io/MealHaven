@@ -1,13 +1,3 @@
-// === MealHaven – Integrated SPA ===
-// Profile (avatar upload), Settings (dark/metric/notify), Preferences,
-// Notifications Center with unread badge — all persisted in localStorage.
-// Updated for: Pantry Recipes grouping; qty "-" never removes (keeps at 0);
-// ingredients coverage counts only pantry items with qty > 0.
-// Added: Hover/tilt motion on recipe cards.
-// Added: Database recipe deletion.
-// Added: Database ingredient and pantry management.
-
-/* ----------------- Utilities ----------------- */
 const qs = (sel, ctx = document) => ctx.querySelector(sel);
 const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 const fmt = (d) => {
@@ -25,7 +15,6 @@ const getLS = (k, fallback) =>
   JSON.parse(localStorage.getItem(k) || JSON.stringify(fallback));
 const setLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-/* ----------------- Seed Data ----------------- */
 const SAMPLE_RECIPES = [
   {
     id: "r1",
@@ -168,13 +157,11 @@ const SAMPLE_PANTRY = [
 const SAMPLE_PLANS = {};
 const SAMPLE_FAVS = ["r1", "r3"];
 
-/* ----------------- Settings-like models ----------------- */
 const MH_SETTINGS_KEY = "mh_settings";
 const MH_PROFILE_KEY = "mh_profile";
 const MH_PREFS_KEY = "mh_preferences";
 const MH_NOTIF_KEY = "mh_notifications";
 
-// Default to light so first load isn't dark
 const defaultSettings = {
   theme: getLS("mh_theme", "light") || "light",
   metric: getLS("mh_metric", true),
@@ -204,7 +191,6 @@ const defaultNotifs = [
   },
 ];
 
-/* ----------------- App State ----------------- */
 const state = {
   recipes: getLS("mh_recipes", SAMPLE_RECIPES),
   pantry: getLS("mh_pantry", SAMPLE_PANTRY),
@@ -217,7 +203,6 @@ const state = {
   notifications: getLS(MH_NOTIF_KEY, defaultNotifs),
 };
 
-/* ----------------- Persistence ----------------- */
 function persist() {
   setLS("mh_recipes", state.recipes);
   setLS("mh_pantry", state.pantry);
@@ -231,41 +216,33 @@ function persist() {
   setLS("mh_theme", state.settings.theme);
 }
 
-/* ----------------- Ingredient & Pantry Management ----------------- */
 async function initializeIngredientSystem() {
-  console.log("🔄 Initializing ingredient system...");
+  console.log("Initializing ingredient system...");
 
   try {
-    // Load ingredients
     if (window.loadIngredients) {
       await window.loadIngredients();
     } else {
-      console.warn("⚠️ window.loadIngredients not available");
+      console.warn("window.loadIngredients not available");
     }
-
-    // Load pantry items
     if (window.loadPantryItems) {
       await window.loadPantryItems();
     } else {
-      console.warn("⚠️ window.loadPantryItems not available");
+      console.warn("window.loadPantryItems not available");
     }
-
-    // Populate pantry state
     if (window.populatePantryState) {
       window.populatePantryState();
     } else {
-      console.warn("⚠️ window.populatePantryState not available");
+      console.warn("window.populatePantryState not available");
     }
-
-    // Setup ingredient select in pantry modal
     const ingredientSelect = document.getElementById("ingredientSelect");
     if (ingredientSelect && window.populateIngredientSelect) {
       window.populateIngredientSelect(ingredientSelect);
     }
 
-    console.log("✅ Ingredient system initialized");
+    console.log("Ingredient system initialized");
   } catch (error) {
-    console.error("❌ Failed to initialize ingredient system:", error);
+    console.error("Failed to initialize ingredient system:", error);
   }
 }
 
@@ -277,18 +254,16 @@ function setupPantryForm() {
   const ingredientForm = document.getElementById("ingredientForm");
   const ingredientCancelBtn = document.getElementById("ingredientCancelBtn");
 
-  // New ingredient button
   if (newIngredientBtn) {
     newIngredientBtn.addEventListener("click", () => {
       if (ingredientDialog) {
         ingredientDialog.showModal();
       } else {
-        console.error("❌ Ingredient dialog not found");
+        console.error("Ingredient dialog not found");
       }
     });
   }
 
-  // Ingredient form submission
   if (ingredientForm) {
     ingredientForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -310,7 +285,6 @@ function setupPantryForm() {
         const result = await window.createIngredient(ingredientData);
 
         if (result.success) {
-          // Add new ingredient to select
           if (ingredientSelect) {
             const option = document.createElement("option");
             option.value = result.ingredient_id;
@@ -321,7 +295,6 @@ function setupPantryForm() {
             ingredientSelect.appendChild(option);
             ingredientSelect.value = result.ingredient_id;
 
-            // Also update the ingredient name field
             const ingredientNameInput = document.querySelector(
               'input[name="ingredient_name"]'
             );
@@ -339,8 +312,6 @@ function setupPantryForm() {
       }
     });
   }
-
-  // Ingredient cancel button - FIXED NULL REFERENCE
   if (ingredientCancelBtn) {
     ingredientCancelBtn.addEventListener("click", () => {
       if (ingredientDialog) {
@@ -348,8 +319,6 @@ function setupPantryForm() {
       }
     });
   }
-
-  // Update ingredient name when select changes
   if (ingredientSelect) {
     ingredientSelect.addEventListener("change", function () {
       const selectedOption = this.options[this.selectedIndex];
@@ -357,50 +326,41 @@ function setupPantryForm() {
         'input[name="ingredient_name"]'
       );
       if (ingredientNameInput && selectedOption.textContent) {
-        // Extract just the name without category
         const name = selectedOption.textContent.split(" (")[0];
         ingredientNameInput.value = name;
       }
     });
   }
 
-  // Update pantry form submission - FIXED UNDEFINED ERROR
-  // Update pantry form submission - FIXED VERSION
   if (pantryForm) {
     pantryForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const formData = new FormData(pantryForm);
 
-      // Debug: log all form data
       console.log("📋 Form data entries:");
       for (let [key, value] of formData.entries()) {
         console.log(`  ${key}: ${value}`);
       }
 
-      console.log("🔄 Submitting pantry data:", pantryData);
+      console.log("Submitting pantry data:", pantryData);
 
-      // Validate required fields
       if (!pantryData.ingredient_id || pantryData.ingredient_id === "") {
         alert("Please select an ingredient");
         return;
       }
-
       if (!pantryData.quantity || parseFloat(pantryData.quantity) <= 0) {
         alert("Please enter a valid quantity");
         return;
       }
-
       if (!pantryData.purchase_date) {
         alert("Please select a purchase date");
         return;
       }
-
       try {
         if (!window.createPantryItem) {
           throw new Error("Pantry item creation not available");
         }
-
         const result = await window.createPantryItem(pantryData);
 
         if (result.success) {
@@ -410,7 +370,6 @@ function setupPantryForm() {
           }
           alert("Pantry item added successfully!");
 
-          // Reload everything
           await initializeIngredientSystem();
           if (window.render) {
             window.render();
@@ -425,28 +384,24 @@ function setupPantryForm() {
     });
   }
 }
-
-/* FIXED: Pantry Dialog Function */
 function openPantryDialog(item = null) {
   const dlg = document.getElementById("pantryDialog");
   const form = document.getElementById("pantryForm");
 
   if (!dlg || !form) {
-    console.error("❌ Pantry dialog or form not found");
+    console.error("Pantry dialog or form not found");
     return;
   }
 
   form.reset();
   delete form.dataset.editId;
 
-  // Populate ingredient select if available
   const ingredientSelect = document.getElementById("ingredientSelect");
   if (ingredientSelect && window.populateIngredientSelect) {
     window.populateIngredientSelect(ingredientSelect);
   }
 
   if (item) {
-    // For editing existing items
     const nameInput = form.querySelector('input[name="ingredient_name"]');
     const qtyInput = form.querySelector('input[name="quantity"]');
     const expiryInput = form.querySelector('input[name="expiry_date"]');
@@ -460,10 +415,8 @@ function openPantryDialog(item = null) {
     form.dataset.editId = item.id;
   }
 
-  // FIXED: Remove the problematic onclick assignment
   const cancelButton = form.querySelector(".btn-secondary");
   if (cancelButton) {
-    // Replace the inline onclick with event listener
     cancelButton.onclick = null; // Clear existing
     cancelButton.addEventListener("click", function () {
       dlg.close();
@@ -473,7 +426,6 @@ function openPantryDialog(item = null) {
   dlg.showModal();
 }
 
-/* ----------------- View Switching ----------------- */
 qsa(".tab").forEach((btn) =>
   btn.addEventListener("click", () => {
     const view = btn.dataset.view;
@@ -490,7 +442,6 @@ function showView(view) {
 }
 showView(localStorage.getItem("mh_last_view") || "home");
 
-/* ----------------- Theme ----------------- */
 function applyTheme() {
   const html = document.documentElement;
   const theme = (state.settings.theme || "light").toLowerCase();
@@ -507,7 +458,6 @@ qs("#toggleThemeBtn")?.addEventListener("click", () => {
   if (pm) pm.hidden = true;
 });
 
-/* Settings switches panel */
 ["dark", "metric", "notify"].forEach((key) => {
   const m = {
     dark: "#darkToggle",
@@ -535,7 +485,6 @@ qs("#notifyToggle")?.addEventListener("change", (e) => {
   persist();
 });
 
-/* ----------------- Profile menu + Avatar ----------------- */
 const profileBtn = qs("#profileBtn");
 const profileMenu = qs("#profileMenu");
 const profileName = qs("#profileName");
@@ -610,7 +559,6 @@ clearAvatarBtn?.addEventListener("click", () => {
   refreshAvatarUI();
 });
 
-/* ----------------- Preferences ----------------- */
 ["diet", "calories", "allergies", "dislikes"].forEach((k) => {
   const map = {
     diet: "#prefDiet",
@@ -633,7 +581,6 @@ qs("#savePrefsBtn")?.addEventListener("click", () => {
   alert("Preferences saved");
 });
 
-/* ----------------- Notifications Center ----------------- */
 const notifBtn = qs("#notifBtn");
 const notifBadge = qs("#notifBadge");
 const notifDialog = qs("#notifDialog");
@@ -735,7 +682,6 @@ window.MHNotify = (title, body) => {
   updateNotifBadge();
 };
 
-/* ----------------- Home Widgets ----------------- */
 function renderTrending() {
   const wrap = qs("#trendingGrid");
   if (!wrap) return;
@@ -826,7 +772,6 @@ function renderWeekStrip() {
   });
 }
 
-/* ----------------- Recipes logic ----------------- */
 function getPlannedSlots(dateKey, recipeId) {
   const events = state.plans[dateKey] || [];
   return events.filter((ev) => ev.id === recipeId).map((ev) => ev.slot);
@@ -837,7 +782,6 @@ function isPlannedAnyDate(recipeId) {
   );
 }
 function coverageForRecipe(r) {
-  // Only items with qty > 0 count as available
   const usable = new Set(
     state.pantry
       .filter((p) => (p.qty || 0) > 0)
@@ -923,7 +867,6 @@ function recipeCard(r, selectedDate = "") {
   </article>`;
 }
 
-/* Ingredient add/remove dialogs from recipe checkboxes */
 function ensureIngredientDialog() {
   if (qs("#ingredientDialog")) return;
   const dlg = document.createElement("dialog");
@@ -1061,12 +1004,11 @@ function hookIngredientChecks(scope = document) {
   });
 }
 
-/* ----------------- Hover/Tilt Motion for Recipe Cards ----------------- */
 function hookRecipeHoverMotion(scope = document) {
   qsa(".recipe", scope).forEach((card) => {
     if (card.dataset.motion) return;
     card.dataset.motion = "1";
-    const MAX = 6; // degrees
+    const MAX = 6;
 
     card.addEventListener("mousemove", (e) => {
       const r = card.getBoundingClientRect();
@@ -1089,9 +1031,7 @@ function hookRecipeHoverMotion(scope = document) {
   });
 }
 
-/* Buttons inside recipe cards */
 function hookRecipeButtons(scope = document) {
-  // plan/unplan
   scope
     .querySelectorAll('.recipe .actions [data-action="plan"]')
     .forEach((btn) => {
@@ -1130,7 +1070,6 @@ function hookRecipeButtons(scope = document) {
       });
     });
 
-  // favourite toggle
   scope
     .querySelectorAll('.recipe .actions [data-action="fav"]')
     .forEach((btn) => {
@@ -1144,7 +1083,6 @@ function hookRecipeButtons(scope = document) {
       });
     });
 
-  // === UPDATED DELETE HANDLER FOR DATABASE ===
   scope
     .querySelectorAll('.recipe .actions [data-action="delete"]')
     .forEach((btn) => {
@@ -1175,19 +1113,16 @@ function hookRecipeButtons(scope = document) {
         }
 
         try {
-          // Show loading state
           const originalText = this.textContent;
           this.textContent = "Deleting...";
           this.disabled = true;
 
           let databaseId = null;
 
-          // Check if this is a database recipe
           if (recipeId.startsWith("db_")) {
             databaseId = recipe.db_id;
             console.log("Deleting database recipe with ID:", databaseId);
 
-            // Delete from database
             const response = await fetch("../PHP/delete_recipe.php", {
               method: "POST",
               headers: {
@@ -1210,18 +1145,14 @@ function hookRecipeButtons(scope = document) {
             console.log("Deleting sample recipe (local only):", recipeId);
           }
 
-          // Remove from local state (always do this)
           console.log("Removing from local state...");
 
-          // Remove from recipes array
           state.recipes = state.recipes.filter((r) => r.id !== recipeId);
           console.log("✅ Removed from recipes array");
 
-          // Remove from favourites
           state.favs = state.favs.filter((favId) => favId !== recipeId);
           console.log("✅ Removed from favourites");
 
-          // Remove from meal plans
           let planCount = 0;
           Object.keys(state.plans).forEach((date) => {
             const before = state.plans[date].length;
@@ -1240,11 +1171,9 @@ function hookRecipeButtons(scope = document) {
           });
           console.log(`✅ Removed from ${planCount} meal plan entries`);
 
-          // Save to localStorage
           persist();
           console.log("💾 State persisted");
 
-          // Show success notification
           if (typeof MHNotify === "function") {
             MHNotify(
               "Recipe Deleted",
@@ -1252,7 +1181,6 @@ function hookRecipeButtons(scope = document) {
             );
           }
 
-          // Re-render all views
           renderHome();
           renderRecipes();
           renderFavourites();
@@ -1263,7 +1191,6 @@ function hookRecipeButtons(scope = document) {
           console.error("❌ Delete failed:", error);
           alert(`Delete failed: ${error.message}`);
 
-          // Reset button
           this.textContent = "Delete";
           this.disabled = false;
         }
@@ -1271,7 +1198,6 @@ function hookRecipeButtons(scope = document) {
     });
 }
 
-/* Render Recipes (with Pantry Coverage grouping) */
 function renderRecipes() {
   const q = (qs("#recipeSearch")?.value || "").toLowerCase();
   const list = qs("#recipeList");
@@ -1345,7 +1271,6 @@ function renderRecipes() {
   hookRecipeHoverMotion(list);
 }
 
-/* Non-tab view switches */
 qsa("[data-view]:not(.tab)").forEach((btn) => {
   btn.addEventListener("click", () => {
     showView(btn.dataset.view);
@@ -1353,7 +1278,6 @@ qsa("[data-view]:not(.tab)").forEach((btn) => {
   });
 });
 
-/* Favourites */
 function renderFavourites() {
   const wrap = qs("#favList");
   if (!wrap) return;
@@ -1365,7 +1289,6 @@ function renderFavourites() {
   hookRecipeHoverMotion(wrap);
 }
 
-/* Planner (Calendar) */
 function renderCalendar() {
   const month = state.monthCursor;
   const year = month.getFullYear();
@@ -1457,7 +1380,6 @@ function openPlanDialog(recipeId = null, dateKey = today(), editIndex = null) {
   dlg.querySelector('button[value="cancel"]').onclick = () => dlg.close();
 }
 
-/* Pantry */
 function statusOf(p) {
   if (p.qty === 0) return "out";
   if (p.qty <= 1) return "low";
@@ -1469,7 +1391,6 @@ function openPantryDialog(item = null) {
   form.reset();
   delete form.dataset.editId;
 
-  // Populate ingredient select if available
   const ingredientSelect = document.getElementById("ingredientSelect");
   if (ingredientSelect && window.populateIngredientSelect) {
     window.populateIngredientSelect(ingredientSelect);
@@ -1548,7 +1469,6 @@ function renderPantry() {
     .join("");
   tbody.innerHTML = html || '<tr><td colspan="7">No items found.</td></tr>';
 
-  // Qty +/- (never remove at 0)
   tbody.querySelectorAll("[data-q]").forEach((b) => {
     b.addEventListener("click", (e) => {
       const tr = e.target.closest("tr");
@@ -1568,7 +1488,6 @@ function renderPantry() {
     });
   });
 
-  // Delete/Edit
   tbody.querySelectorAll('[data-act="del"]').forEach((b) =>
     b.addEventListener("click", async (e) => {
       const tr = e.target.closest("tr");
@@ -1617,13 +1536,10 @@ qs("#pantrySearch")?.addEventListener("input", renderPantry);
 qs("#pantryCategoryFilter")?.addEventListener("change", renderPantry);
 qs("#addPantryBtn")?.addEventListener("click", () => openPantryDialog());
 
-/* Search & filters */
 qs("#recipeSearch")?.addEventListener("input", renderRecipes);
 qs("#recipesDateFilter")?.addEventListener("change", renderRecipes);
 qs("#recipeCategory")?.addEventListener("change", renderRecipes);
 
-// Pantry Recipes (grouping) toggle button -> add to your Recipes toolbar HTML:
-// <button id="pantryCoverageBtn" class="btn">Pantry Recipes</button>
 const pantryCoverageBtn = qs("#pantryCoverageBtn");
 if (pantryCoverageBtn) {
   pantryCoverageBtn.addEventListener("click", () => {
@@ -1636,7 +1552,6 @@ if (pantryCoverageBtn) {
   });
 }
 
-/* Home aggregate & Master render */
 function renderHome() {
   renderTrending();
   renderExpiringSoon();
@@ -1651,7 +1566,6 @@ function render() {
   renderPantry();
 }
 
-// Debug functions
 window.debugRecipeInfo = function (recipeId) {
   const recipe = state.recipes.find((r) => r.id === recipeId);
   if (!recipe) {
@@ -1676,27 +1590,22 @@ window.listDatabaseRecipes = function () {
   console.log("Total:", dbRecipes.length);
 };
 
-// Expose functions to global scope
 window.state = state;
 window.persist = persist;
 window.render = render;
 window.renderRecipes = renderRecipes;
 window.renderHome = renderHome;
 
-// Initialize ingredient system when DOM is loaded
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("🏠 DOM Content Loaded - initializing systems");
 
-  // Initialize ingredient and pantry system
   await initializeIngredientSystem();
   setupPantryForm();
 
-  // Existing initialization
   setupPantryChips();
   render();
 });
 
-// Load database recipes when the script loads
 setTimeout(async () => {
   console.log("⏰ Timeout elapsed, loading recipes...");
   if (window.refreshRecipesFromDatabase) {
@@ -1704,14 +1613,12 @@ setTimeout(async () => {
   }
 }, 500);
 
-// Handle cancel button
 document
   .getElementById("pantryCancelBtn")
   .addEventListener("click", function () {
     document.getElementById("pantryDialog").close();
   });
 
-// Handle add pantry button
 document.getElementById("addPantryBtn").addEventListener("click", function () {
   document.getElementById("pantryDialog").showModal();
 });
