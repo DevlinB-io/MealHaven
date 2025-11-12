@@ -1,5 +1,9 @@
 <?php
 header('Content-Type: application/json');
+
+// Start session to get the actual logged-in user
+session_start();
+
 require_once '../DATABASE/database_connection.php';
 
 if ($database_connection->connect_error) {
@@ -9,7 +13,14 @@ if ($database_connection->connect_error) {
 }
 
 try {
-    $user_id = $_GET['user_id'] ?? 1;
+    // Check if user is logged in, otherwise return empty array
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode([]);
+        exit;
+    }
+    
+    // Use the actual logged-in user ID from session
+    $user_id = $_SESSION['user_id'];
     
     $stmt = $database_connection->prepare("
         SELECT 
