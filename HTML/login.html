@@ -459,6 +459,24 @@
         transform: translateY(-1px);
       }
 
+      /* Admin login link */
+      .admin-login-link {
+        text-align: center;
+        margin-top: 16px;
+      }
+
+      .admin-login-link a {
+        color: var(--text-light);
+        font-size: 14px;
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .admin-login-link a:hover {
+        color: var(--primary);
+        text-decoration: underline;
+      }
+
       /* Footer */
       .footer {
         text-align: center;
@@ -702,6 +720,11 @@
           </div>
 
           <a href="register.html" class="alt-action">Create account</a>
+
+          <!-- Admin Login Link - Added under Create Account -->
+          <div class="admin-login-link">
+            <a href="admin_login.html">Admin Login</a>
+          </div>
 
           <p class="footer">
             By signing in, you agree to our <a href="#">Terms</a> and
