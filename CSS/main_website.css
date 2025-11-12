@@ -13,8 +13,6 @@
   --fade: opacity 0.25s ease, transform 0.25s ease, background-color 0.25s ease,
     color 0.25s ease, border-color 0.25s ease;
 }
-
-/* Light theme */
 :root[data-theme="light"],
 body.light {
   --bg: #f7faf9;
@@ -29,7 +27,6 @@ body.light {
   --pill: #eef6f0;
   --shadow: 0 10px 30px rgba(16, 24, 20, 0.08);
 }
-
 * {
   box-sizing: border-box;
   transition: var(--fade);
@@ -50,8 +47,6 @@ body {
     var(--bg);
   color: var(--text);
 }
-
-/* Top bar */
 .topbar {
   position: sticky;
   top: 0;
@@ -86,7 +81,6 @@ body {
   color: var(--muted);
   margin-top: 4px;
 }
-
 .tabs {
   display: flex;
   align-items: center;
@@ -117,7 +111,6 @@ body {
   border: 2px solid var(--brand);
   box-shadow: 0 0 8px color-mix(in oklab, var(--brand) 25%, transparent);
 }
-
 .spacer {
   flex: 1;
 }
@@ -196,8 +189,6 @@ body {
 .menu button:hover {
   background: color-mix(in oklab, var(--brand) 10%, var(--card));
 }
-
-/* Layout */
 main {
   padding: 18px;
 }
@@ -218,7 +209,6 @@ main {
     transform: none;
   }
 }
-
 .grid {
   display: grid;
   gap: 16px;
@@ -229,7 +219,6 @@ main {
 .span-2 {
   grid-column: span 2 / span 2;
 }
-
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -253,8 +242,6 @@ main {
 .card h3 {
   margin: 0;
 }
-
-/* Recipes grid */
 .recipe-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -269,7 +256,6 @@ main {
   display: flex;
   flex-direction: column;
 }
-
 .recipe .thumb {
   aspect-ratio: 16/9;
   overflow: hidden;
@@ -295,8 +281,6 @@ main {
   border-color: var(--brand);
   color: #fff;
 }
-
-/* Subtle green accent to “pop” recipes */
 .recipe-pop {
   border-top: 3px solid var(--brand);
   box-shadow: 0 8px 24px rgba(52, 199, 89, 0.12);
@@ -305,7 +289,6 @@ main {
   border-left: 2px solid color-mix(in oklab, var(--brand) 40%, transparent);
   padding-left: 8px;
 }
-/* Hover motion on recipe cards */
 .recipe {
   will-change: transform, box-shadow;
   transform: translateY(0) scale(1);
@@ -317,8 +300,6 @@ main {
   box-shadow: 0 16px 28px rgba(52, 199, 89, 0.18),
     0 8px 16px rgba(0, 0, 0, 0.12);
 }
-
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .recipe,
   .recipe:hover {
@@ -326,8 +307,6 @@ main {
     box-shadow: none !important;
   }
 }
-
-/* Group headers for Pantry Recipes grouping */
 .group-header {
   grid-column: 1 / -1;
   font-weight: 700;
@@ -337,8 +316,6 @@ main {
   background: color-mix(in oklab, var(--brand) 10%, var(--card));
   border-radius: 10px;
 }
-
-/* Week strip & pills */
 .week-strip {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -366,8 +343,6 @@ main {
   font-size: 12px;
   margin: 2px 4px 0 0;
 }
-
-/* Lists & stats */
 .list {
   list-style: none;
   margin: 0;
@@ -406,8 +381,6 @@ main {
 .kpi.out {
   color: #d64545;
 }
-
-/* Calendar */
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -440,8 +413,6 @@ main {
   display: inline-block;
   margin-left: 4px;
 }
-
-/* Buttons & inputs */
 .btn {
   border: 1px solid var(--line);
   background: var(--card);
@@ -496,8 +467,6 @@ input:focus {
   align-items: center;
   gap: 10px;
 }
-
-/* Pantry filters */
 .filters {
   display: flex;
   gap: 8px;
@@ -515,8 +484,6 @@ input:focus {
   outline: 2px solid var(--ring);
   background: color-mix(in oklab, var(--brand) 10%, var(--card));
 }
-
-/* Pantry table + Qty vertical controls */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -561,8 +528,6 @@ input:focus {
   line-height: 1;
   border-radius: 8px;
 }
-
-/* Profile/settings & dialogs */
 .profile-wrap {
   max-width: 720px;
   margin: auto;
@@ -585,7 +550,6 @@ input:focus {
 .switch input {
   accent-color: var(--brand);
 }
-
 .modal {
   padding: 0;
   border-radius: 14px;
@@ -614,8 +578,6 @@ input:focus {
   gap: 8px;
   padding: 8px 0 0 0;
 }
-
-/* Responsive */
 @media (max-width: 960px) {
   .grid-3 {
     grid-template-columns: 1fr;
