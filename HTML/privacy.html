@@ -4,263 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Privacy Policy - MealHaven</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../CSS/privacy.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      /* Modern color palette matching login page */
-      :root {
-        --primary: #22c55e;
-        --primary-dark: #16a34a;
-        --primary-light: rgba(34, 197, 94, 0.1);
-        --secondary: #f97316;
-        --accent: #3b82f6;
-        --text: #1e293b;
-        --text-light: #64748b;
-        --background: #ffffff;
-        --surface: #f8fafc;
-        --border: #e2e8f0;
-        --border-light: #f1f5f9;
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --radius: 12px;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Inter", system-ui, sans-serif;
-        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-        color: var(--text);
-        line-height: 1.7;
-        min-height: 100vh;
-        padding: 20px;
-      }
-
-      .container {
-        max-width: 900px;
-        margin: 0 auto;
-      }
-
-      /* Header */
-      .header {
-        background: var(--background);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-lg);
-        padding: 2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-        border: 1px solid var(--border);
-      }
-
-      .logo-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        margin-bottom: 1.5rem;
-      }
-
-      .logo {
-        width: 60px;
-        height: 60px;
-      }
-
-      .brand {
-        font-weight: 800;
-        font-size: 24px;
-        letter-spacing: -0.5px;
-      }
-
-      .brand .meal {
-        color: var(--primary);
-      }
-
-      .brand .haven {
-        color: var(--secondary);
-      }
-
-      .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: var(--text);
-      }
-
-      .page-subtitle {
-        color: var(--text-light);
-        font-size: 1.1rem;
-      }
-
-      /* Back button */
-      .back-nav {
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-
-      .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        background: var(--background);
-        color: var(--text);
-        text-decoration: none;
-        border-radius: var(--radius);
-        border: 1.5px solid var(--border);
-        font-weight: 500;
-        transition: all 0.2s ease;
-        box-shadow: var(--shadow);
-      }
-
-      .back-btn:hover {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3);
-      }
-
-      /* Content */
-      .content {
-        background: var(--background);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-lg);
-        padding: 3rem;
-        border: 1px solid var(--border);
-      }
-
-      h2 {
-        color: var(--primary);
-        font-size: 1.5rem;
-        margin: 2.5rem 0 1rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--primary-light);
-      }
-
-      h2:first-child {
-        margin-top: 0;
-      }
-
-      h3 {
-        color: var(--secondary);
-        font-size: 1.2rem;
-        margin: 1.5rem 0 0.75rem 0;
-      }
-
-      p {
-        margin-bottom: 1rem;
-        color: var(--text);
-      }
-
-      ul {
-        margin: 1rem 0;
-        padding-left: 1.5rem;
-      }
-
-      li {
-        margin-bottom: 0.5rem;
-      }
-
-      a {
-        color: var(--primary);
-        text-decoration: none;
-        font-weight: 500;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      .contact-info {
-        background: var(--primary-light);
-        padding: 1.5rem;
-        border-radius: var(--radius);
-        margin: 2rem 0;
-        border-left: 4px solid var(--primary);
-      }
-
-      /* Footer */
-      .footer {
-        text-align: center;
-        margin-top: 3rem;
-        padding-top: 2rem;
-        border-top: 1px solid var(--border);
-        color: var(--text-light);
-        font-size: 0.9rem;
-      }
-
-      .footer-links {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        margin-top: 1rem;
-      }
-
-      .footer-links a {
-        color: var(--text-light);
-        transition: color 0.2s ease;
-      }
-
-      .footer-links a:hover {
-        color: var(--primary);
-      }
-
-      /* Mobile responsiveness */
-      @media (max-width: 768px) {
-        .content {
-          padding: 2rem;
-        }
-
-        .page-title {
-          font-size: 1.75rem;
-        }
-
-        .logo-container {
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .brand {
-          font-size: 20px;
-        }
-
-        .footer-links {
-          flex-direction: column;
-          gap: 1rem;
-        }
-      }
-
-      @media (max-width: 480px) {
-        body {
-          padding: 10px;
-        }
-
-        .content {
-          padding: 1.5rem;
-        }
-
-        .header {
-          padding: 1.5rem;
-        }
-      }
-    </style>
   </head>
   <body>
     <div class="container">
-      <!-- Header -->
       <header class="header">
         <div class="logo-container">
-          <!-- MealHaven Logo -->
           <svg
             class="logo"
             viewBox="0 0 128 128"
@@ -295,40 +51,33 @@
                 </feMerge>
               </filter>
             </defs>
-            <!-- Leaf -->
             <path
               d="M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z"
               fill="#22c55e"
               opacity="0.9"
               filter="url(#soft-glow-green)"
             />
-            <!-- Roof -->
             <path d="M16 56l48-28 48 28v10l-48-26-48 26V56z" fill="#22c55e" />
-            <!-- House body -->
             <path
               d="M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z"
               fill="#f97316"
               opacity="0.9"
               filter="url(#soft-glow-orange)"
             />
-            <!-- Door -->
             <path
               d="M56 88a8 8 0 0 1 16 0v26H56V88z"
               fill="#1e293b"
               opacity="0.85"
             />
-            <!-- Window -->
             <g fill="#1e293b" opacity="0.85">
               <rect x="44" y="66" width="10" height="10" rx="1.5" />
               <rect x="58" y="66" width="10" height="10" rx="1.5" />
             </g>
-            <!-- Fork -->
             <path
               d="M40 106V70c0-1.7 1.3-3 3-3s3 1.3 3 3v8h2v-8c0-1.7 1.3-3 3-3s3 1.3 3 3v36h-14z"
               fill="#1e293b"
               opacity="0.85"
             />
-            <!-- Spoon -->
             <path
               d="M82 70c0-4.4 3.6-8 8-8s8 3.6 8 8c0 3.2-1.8 6-4.4 7.3V106H86V77.3c-2.6-1.3-4.4-4.1-4.4-7.3z"
               fill="#1e293b"
@@ -343,8 +92,6 @@
         <h1 class="page-title">Privacy Policy</h1>
         <p class="page-subtitle">How we protect and use your information</p>
       </header>
-
-      <!-- Back Navigation -->
       <div class="back-nav">
         <a href="login.html" class="back-btn">
           <svg
@@ -372,8 +119,6 @@
           Back to Login
         </a>
       </div>
-
-      <!-- Content -->
       <main class="content">
         <h2>Data Protection and Privacy Overview</h2>
         <p>
@@ -438,7 +183,6 @@
         <p><em>Last updated: January 2025</em></p>
       </main>
 
-      <!-- Footer -->
       <footer class="footer">
         <p>© 2025 MealHaven. All rights reserved.</p>
         <div class="footer-links">

@@ -4,20 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MealHaven</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../CSS/main_website.css" />
+    <link rel="stylesheet" href="../CSS/recipe_modal.css" />
+    <link rel="stylesheet" href="../CSS/pantry_modal.css" />
+    <link rel="stylesheet" href="../CSS/preferences_modal.css" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../CSS/main_website.css" />
-    <link rel="stylesheet" href="../CSS/recipe_modal.css" />
-    <link rel="stylesheet" href="../CSS/pantry_modal.css" />
-        <link rel="stylesheet" href="../CSS/preferences_modal.css" />
-
+    
   </head>
   <body>
-    <!-- Top Navigation -->
     <header class="topbar" role="banner">
       <div class="brand">
         <div class="logo">
@@ -28,7 +29,6 @@
           <span class="tagline">Plan smart • Waste less • Eat better</span>
         </div>
       </div>
-
       <nav class="tabs" aria-label="Primary">
         <button class="tab active" data-view="home" aria-current="page">
           Home
@@ -44,7 +44,6 @@
             <span id="notifBadge" class="badge" hidden>0</span>
           </button>
 
-          <!-- Sign up button (redirects to register page) -->
           <button
             id="signupBtn"
             class="btn"
@@ -54,7 +53,6 @@
             Sign up
           </button>
 
-          <!-- Log in button (redirects to login page) -->
           <button
             id="loginBtn"
             class="btn primary"
@@ -71,7 +69,7 @@
             aria-expanded="false"
             aria-label="Profile menu"
           >
-            DM
+            
           </button>
           <div id="profileMenu" class="menu" role="menu" hidden>
             <button data-view="profile" role="menuitem">Profile</button>
@@ -84,7 +82,6 @@
     </header>
 
     <main id="views">
-      <!-- HOME / DASHBOARD -->
       <section id="home" class="view active">
         <div class="grid grid-3">
           <article class="card span-2">
@@ -126,7 +123,6 @@
         </div>
       </section>
 
-      <!-- RECIPES -->
       <section id="recipes" class="view">
         <div class="toolbar">
           <h2>Recipes</h2>
@@ -163,7 +159,6 @@
               aria-label="Filter by planned date"
             />
 
-            <!-- SINGLE: Pantry Recipes grouping button -->
             <button
               id="pantryCoverageBtn"
               class="btn"
@@ -178,11 +173,9 @@
             </button>
           </div>
         </div>
-        <!-- Headers will be injected when grouping is ON -->
         <div id="recipeList" class="recipe-grid"></div>
       </section>
 
-      <!-- MEAL PLANNER -->
       <section id="planner" class="view">
         <div class="toolbar">
           <h2>Meal Planner</h2>
@@ -204,7 +197,6 @@
         ></div>
       </section>
 
-      <!-- PANTRY -->
       <section id="pantry" class="view">
         <div class="toolbar">
           <h2>Pantry</h2>
@@ -242,13 +234,11 @@
         </table>
       </section>
 
-      <!-- FAVOURITES -->
       <section id="favourites" class="view">
         <div class="toolbar"><h2>Favourites</h2></div>
         <div id="favList" class="recipe-grid"></div>
       </section>
 
-      <!-- PROFILE -->
       <section id="profile" class="view">
         <div class="profile-wrap card">
           <div class="profile-row">
@@ -278,7 +268,6 @@
         </div>
       </section>
 
-      <!-- SETTINGS -->
       <section id="settings" class="view">
         <div class="profile-wrap card">
           <h2>Settings</h2>
@@ -300,12 +289,10 @@
         </div>
       </section>
 
-<!-- PREFERENCES -->
 <section id="preferences" class="view">
   <div class="profile-wrap card">
     <div class="modal-body">
       <h3>Preferences</h3>
-      
       <div class="form-grid">
         <label>
           Diet Type
@@ -432,7 +419,6 @@
     </div>
   </form>
 </dialog>
-    <!-- Recipe Create Modal -->
     <dialog id="recipeDialog" class="modal">
       <form
         id="recipeForm"
@@ -539,8 +525,6 @@
         </div>
       </form>
     </dialog>
-
-    <!-- Add-to-plan dialog -->
     <dialog id="planDialog" class="modal">
       <form method="dialog" class="modal-body" id="planForm">
         <h3>Add to Meal Plan</h3>
@@ -561,8 +545,6 @@
         </div>
       </form>
     </dialog>
-
-    <!-- Notifications Center -->
     <dialog id="notifDialog" class="modal">
       <div class="modal-body">
         <div class="toolbar">
@@ -580,17 +562,14 @@
         </div>
       </div>
     </dialog>
-    <!-- Ingredient Creation Modal -->
     <dialog id="ingredientDialog" class="modal">
       <form id="ingredientForm" class="modal-body">
         <h3>Create New Ingredient</h3>
-
         <div class="form-grid">
           <label>
             Ingredient Name *
             <input type="text" id="ingredientName" name="name" required />
           </label>
-
           <label>
             Category
             <select id="ingredientCategory" name="category">
@@ -608,7 +587,6 @@
               <option>Beverages</option>
             </select>
           </label>
-
           <label>
             Default Unit
             <select id="ingredientUnit" name="unit_of_measurement">
@@ -623,7 +601,6 @@
               <option value="tbsp">Tablespoons</option>
             </select>
           </label>
-
           <label>
             Shelf Life (days)
             <input
@@ -634,7 +611,6 @@
               step="1"
             />
           </label>
-
           <label>
             Barcode (optional)
             <input
@@ -645,7 +621,6 @@
             />
           </label>
         </div>
-
         <div class="modal-actions">
           <button type="submit" class="btn primary">Create Ingredient</button>
           <button type="button" id="ingredientCancelBtn" class="btn">
@@ -654,16 +629,9 @@
         </div>
       </form>
     </dialog>
-
-    <!-- manage user sessions -->
-<!-- ... existing code ... -->
-
-    <!-- Add these scripts BEFORE main_website.js -->
     <script src="../JAVASCRIPT/database_ingredients.js"></script>
     <script src="../JAVASCRIPT/database_pantry.js"></script>
     <script src="../JAVASCRIPT/database_recipes.js"></script>
-    
-    <!-- Existing scripts -->
     <script src="../JAVASCRIPT/session-handler.js"></script>
     <script src="../JAVASCRIPT/main_website.js"></script>
     <script src="../JAVASCRIPT/create_recipe.js"></script>

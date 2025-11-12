@@ -8,462 +8,13 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../CSS/register_user.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-
-    <style>
-      /* Color variables for consistent theming */
-      :root {
-        --bg1: #ffffff;
-        --bg2: #f8fafc;
-        --accent: #22c55e; /* green */
-        --accent-2: #f97316; /* orange */
-        --primary: #3b82f6; /* blue for focus */
-        --text: #1e293b;
-        --muted: #64748b;
-        --card: #ffffff;
-        --card-border: #e2e8f0;
-        --input: #ffffff;
-        --input-border: #cbd5e1;
-        --btn: #22c55e;
-        --btn-hover: #16a34a;
-        --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        --error: #ef4444;
-        --success: #10b981;
-      }
-
-      /* Base layout */
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-      }
-      body {
-        font-family: "Inter", system-ui, sans-serif;
-        color: var(--text);
-        background: linear-gradient(135deg, var(--bg1), var(--bg2));
-        display: grid;
-        place-items: center;
-        padding: 24px;
-        line-height: 1.6;
-        position: relative;
-        overflow-x: hidden;
-      }
-
-      /* Food-themed background with subtle food icons */
-      .bg-food {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-        opacity: 0.4;
-      }
-
-      .food-icon {
-        position: absolute;
-        opacity: 0.1;
-      }
-
-      .food-icon-1 {
-        top: 10%;
-        left: 5%;
-        width: 80px;
-        height: 80px;
-        background: radial-gradient(circle, #f97316 30%, transparent 70%);
-        border-radius: 50%;
-      }
-
-      .food-icon-2 {
-        top: 70%;
-        right: 10%;
-        width: 60px;
-        height: 60px;
-        background: radial-gradient(circle, #22c55e 30%, transparent 70%);
-        border-radius: 50%;
-      }
-
-      .food-icon-3 {
-        top: 30%;
-        right: 5%;
-        width: 100px;
-        height: 100px;
-        background: radial-gradient(circle, #f59e0b 30%, transparent 70%);
-        border-radius: 50%;
-      }
-
-      .food-icon-4 {
-        top: 80%;
-        left: 15%;
-        width: 50px;
-        height: 50px;
-        background: radial-gradient(circle, #ef4444 30%, transparent 70%);
-        border-radius: 50%;
-      }
-
-      .food-icon-5 {
-        top: 20%;
-        left: 80%;
-        width: 70px;
-        height: 70px;
-        background: radial-gradient(circle, #8b5cf6 30%, transparent 70%);
-        border-radius: 50%;
-      }
-
-      /* Main container */
-      .auth-container {
-        width: 100%;
-        max-width: 680px;
-        margin: 0 auto;
-        z-index: 1;
-      }
-
-      /* Card styling */
-      .card {
-        background: var(--card);
-        border: 1px solid var(--card-border);
-        border-radius: 18px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-      }
-
-      .auth-card {
-        padding: 40px;
-      }
-
-      /* Header section */
-      .auth-header {
-        text-align: center;
-        margin-bottom: 32px;
-      }
-
-      .brand-wrap {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        margin-bottom: 20px;
-      }
-
-      .logo {
-        width: 72px;
-        height: 72px;
-        flex: 0 0 72px;
-      }
-
-      .wordmark {
-        font-weight: 800;
-        font-size: 28px;
-        letter-spacing: 0.5px;
-        line-height: 1;
-      }
-
-      .wordmark .meal {
-        color: var(--accent);
-      }
-      .wordmark .haven {
-        color: var(--accent-2);
-      }
-
-      .auth-header h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 16px 0 10px;
-      }
-
-      .auth-header p {
-        color: var(--muted);
-        margin: 0;
-        font-size: 16px;
-      }
-
-      /* Form layout - 2 columns on desktop */
-      .auth-form {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-        margin-top: 20px;
-      }
-
-      .full {
-        grid-column: 1 / -1;
-      }
-
-      /* Form elements */
-      .form-label {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        position: relative;
-      }
-
-      .form-label span {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text);
-      }
-
-      .input-wrap {
-        position: relative;
-      }
-
-      .input {
-        width: 100%;
-        padding: 14px 16px;
-        border-radius: 12px;
-        background: var(--input);
-        border: 1px solid var(--input-border);
-        color: var(--text);
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        box-sizing: border-box;
-      }
-
-      .input::placeholder {
-        color: #94a3b8;
-      }
-
-      .input:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-      }
-
-      /* Form validation styles */
-      .input.error {
-        border-color: var(--error);
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-      }
-
-      .form-error {
-        color: var(--error);
-        font-size: 12px;
-        margin-top: 6px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .form-error.hidden {
-        display: none;
-      }
-
-      /* Password strength indicator */
-      .password-strength {
-        margin-top: 8px;
-        height: 4px;
-        border-radius: 2px;
-        background: rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-
-      .password-strength-meter {
-        height: 100%;
-        width: 0%;
-        transition: width 0.3s ease, background 0.3s ease;
-      }
-
-      .strength-weak {
-        width: 25%;
-        background: var(--error);
-      }
-      .strength-fair {
-        width: 50%;
-        background: #f59e0b;
-      }
-      .strength-good {
-        width: 75%;
-        background: #3b82f6;
-      }
-      .strength-strong {
-        width: 100%;
-        background: var(--success);
-      }
-
-      /* Password toggle button */
-      .toggle {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: transparent;
-        border: 0;
-        color: #64748b;
-        cursor: pointer;
-        padding: 6px;
-        border-radius: 8px;
-        transition: background 0.2s ease, color 0.2s ease;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .toggle:hover {
-        color: var(--text);
-        background: rgba(0, 0, 0, 0.05);
-      }
-
-      /* Submit button */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 700;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: none;
-        box-sizing: border-box;
-      }
-
-      .btn.primary {
-        background: linear-gradient(135deg, var(--btn), #10b981);
-        color: white;
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
-      }
-
-      .btn.primary:hover {
-        background: linear-gradient(135deg, var(--btn-hover), #0ea271);
-        transform: translateY(-1px);
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
-      }
-
-      .auth-submit {
-        margin-top: 16px;
-        grid-column: 1 / -1;
-        width: 100%;
-      }
-
-      /* Divider */
-      .auth-divider-wrap {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin: 32px 0 24px;
-      }
-
-      .auth-divider-line {
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(0, 0, 0, 0.1),
-          transparent
-        );
-        flex: 1;
-      }
-
-      .auth-divider-text {
-        color: var(--muted);
-        font-size: 14px;
-        white-space: nowrap;
-      }
-
-      /* Alternative login button */
-      .auth-alt-btn {
-        display: block;
-        text-align: center;
-        width: 100%;
-        padding: 16px 24px;
-        border-radius: 12px;
-        background: rgba(0, 0, 0, 0.02);
-        border: 1px solid var(--input-border);
-        color: var(--text);
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-      }
-
-      .auth-alt-btn:hover {
-        background: rgba(0, 0, 0, 0.05);
-        border-color: rgba(0, 0, 0, 0.2);
-        transform: translateY(-1px);
-      }
-
-      /* Footer note */
-      .footnote {
-        text-align: center;
-        color: var(--muted);
-        font-size: 14px;
-        margin-top: 24px;
-        line-height: 1.5;
-      }
-
-      /* Loading state */
-      .btn.loading {
-        pointer-events: none;
-        opacity: 0.8;
-      }
-
-      .btn.loading::after {
-        content: "";
-        width: 16px;
-        height: 16px;
-        border: 2px solid transparent;
-        border-top: 2px solid currentColor;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-left: 8px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* Mobile responsiveness */
-      @media (max-width: 720px) {
-        .auth-card {
-          padding: 32px 24px;
-        }
-        .auth-form {
-          grid-template-columns: 1fr;
-          gap: 16px;
-        }
-        .wordmark {
-          font-size: 24px;
-        }
-        .logo {
-          width: 64px;
-          height: 64px;
-        }
-        .auth-header {
-          margin-bottom: 28px;
-        }
-        .auth-header h1 {
-          font-size: 26px;
-        }
-
-        .food-icon {
-          display: none;
-        }
-
-        .food-icon-1,
-        .food-icon-3 {
-          display: block;
-          width: 40px;
-          height: 40px;
-        }
-      }
-    </style>
   </head>
   <body>
-    <!-- Food-themed background -->
     <div class="bg-food">
       <div class="food-icon food-icon-1"></div>
       <div class="food-icon food-icon-2"></div>
@@ -471,50 +22,41 @@
       <div class="food-icon food-icon-4"></div>
       <div class="food-icon food-icon-5"></div>
     </div>
-
     <main class="auth-container" role="main">
       <section class="auth-card card" aria-labelledby="register-title">
         <header class="auth-header">
           <div class="brand-wrap" aria-hidden="true">
-            <!-- Logo SVG -->
             <svg
               class="logo"
               viewBox="0 0 128 128"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
             >
-              <!-- Leaf -->
               <path
                 d="M92 16c12 2 22 10 26 18-8 6-20 10-36 10-10 0-20-2-28-6 8-14 22-23 38-22z"
                 fill="#22c55e"
                 opacity="0.9"
               />
-              <!-- Roof -->
               <path d="M16 56l48-28 48 28v10l-48-26-48 26V56z" fill="#22c55e" />
-              <!-- House body -->
               <path
                 d="M28 58h72v50a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V58z"
                 fill="#f97316"
                 opacity="0.9"
               />
-              <!-- Door -->
               <path
                 d="M56 88a8 8 0 0 1 16 0v26H56V88z"
                 fill="#1e293b"
                 opacity="0.85"
               />
-              <!-- Window -->
               <g fill="#1e293b" opacity="0.85">
                 <rect x="44" y="66" width="10" height="10" rx="1.5" />
                 <rect x="58" y="66" width="10" height="10" rx="1.5" />
               </g>
-              <!-- Fork -->
               <path
                 d="M40 106V70c0-1.7 1.3-3 3-3s3 1.3 3 3v8h2v-8c0-1.7 1.3-3 3-3s3 1.3 3 3v36h-14z"
                 fill="#1e293b"
                 opacity="0.85"
               />
-              <!-- Spoon -->
               <path
                 d="M82 70c0-4.4 3.6-8 8-8s8 3.6 8 8c0 3.2-1.8 6-4.4 7.3V106H86V77.3c-2.6-1.3-4.4-4.1-4.4-7.3z"
                 fill="#1e293b"
@@ -530,8 +72,6 @@
           <h1 id="register-title">Create your account</h1>
           <p>Join MealHaven and start planning</p>
         </header>
-
-        <!-- Registration form -->
         <form
           action="../PHP/register_user.php"
           method="POST"
@@ -539,7 +79,6 @@
           novalidate
           id="register-form"
         >
-          <!-- First Name field -->
           <label class="form-label">
             <span>First Name</span>
             <div class="input-wrap">
@@ -555,8 +94,6 @@
             </div>
             <div class="form-error hidden" id="first-name-error"></div>
           </label>
-
-          <!-- Last Name field -->
           <label class="form-label">
             <span>Last Name</span>
             <div class="input-wrap">
@@ -572,8 +109,6 @@
             </div>
             <div class="form-error hidden" id="last-name-error"></div>
           </label>
-
-          <!-- Email field -->
           <label class="form-label full">
             <span>Email</span>
             <div class="input-wrap">
@@ -589,8 +124,6 @@
             </div>
             <div class="form-error hidden" id="email-error"></div>
           </label>
-
-          <!-- Phone field -->
           <label class="form-label full">
             <span>Phone Number</span>
             <div class="input-wrap">
@@ -607,8 +140,6 @@
             </div>
             <div class="form-error hidden" id="phone-error"></div>
           </label>
-
-          <!-- Password field -->
           <label class="form-label">
             <span>Password</span>
             <div class="input-wrap">
@@ -660,8 +191,6 @@
             </div>
             <div class="form-error hidden" id="password-error"></div>
           </label>
-
-          <!-- Confirm Password field -->
           <label class="form-label">
             <span>Confirm Password</span>
             <div class="input-wrap">
@@ -707,24 +236,16 @@
             </div>
             <div class="form-error hidden" id="confirm-password-error"></div>
           </label>
-
-          <!-- Submit button -->
           <button type="submit" class="btn primary auth-submit" id="submit-btn">
             Create Account
           </button>
         </form>
-
-        <!-- Divider -->
         <div class="auth-divider-wrap" aria-hidden="true">
           <div class="auth-divider-line"></div>
           <div class="auth-divider-text">Already have an account?</div>
           <div class="auth-divider-line"></div>
         </div>
-
-        <!-- Login link -->
         <a href="login.html" class="auth-alt-btn">Log in</a>
-
-        <!-- Footer note -->
         <p class="footer">
           By signing in, you agree to our <a href="terms.html">Terms</a> and
           <a href="privacy.html">Privacy Policy</a>.
@@ -733,7 +254,6 @@
     </main>
 
     <script>
-      // Password visibility toggles
       document.querySelectorAll(".toggle").forEach((btn) => {
         btn.addEventListener("click", () => {
           const id = btn.getAttribute("data-target");
@@ -741,40 +261,33 @@
           if (!input) return;
           const isPwd = input.type === "password";
           input.type = isPwd ? "text" : "password";
-
-          // Update button icon and label
           const icon = btn.querySelector("svg");
           if (isPwd) {
             btn.setAttribute("aria-label", "Hide password");
-            // Change to eye-off icon
+
             icon.innerHTML = `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                              <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                              <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                              <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
           } else {
             btn.setAttribute("aria-label", "Show password");
-            // Change back to eye icon
             icon.innerHTML = `<path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                              <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
           }
         });
       });
 
-      // Password strength indicator
       const passwordInput = document.getElementById("pwd");
       const strengthMeter = document.getElementById("password-strength-meter");
 
       passwordInput.addEventListener("input", function () {
         const value = this.value;
         let strength = 0;
-
-        // Check password strength criteria
         if (value.length >= 8) strength++;
         if (value.match(/[a-z]/) && value.match(/[A-Z]/)) strength++;
         if (value.match(/\d/)) strength++;
         if (value.match(/[^a-zA-Z\d]/)) strength++;
 
-        // Update strength meter
         strengthMeter.className = "password-strength-meter";
         if (value.length > 0) {
           if (strength <= 1) {
@@ -789,17 +302,12 @@
         }
       });
 
-      // Form validation
       const form = document.getElementById("register-form");
       const submitBtn = document.getElementById("submit-btn");
 
       form.addEventListener("submit", function (e) {
-        // allow form to submit to php
-
-        // Basic validation
         let isValid = true;
 
-        // Validate first name
         const firstName = document.getElementById("first-name");
         const firstNameError = document.getElementById("first-name-error");
         if (!firstName.value.trim()) {
@@ -809,7 +317,6 @@
           clearError(firstName, firstNameError);
         }
 
-        // Validate last name
         const lastName = document.getElementById("last-name");
         const lastNameError = document.getElementById("last-name-error");
         if (!lastName.value.trim()) {
@@ -819,7 +326,6 @@
           clearError(lastName, lastNameError);
         }
 
-        // Validate email
         const email = document.getElementById("email");
         const emailError = document.getElementById("email-error");
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -833,7 +339,6 @@
           clearError(email, emailError);
         }
 
-        // Validate phone
         const phone = document.getElementById("phone");
         const phoneError = document.getElementById("phone-error");
         const phoneRegex = /^[0-9+\-\s()]{7,}$/;
@@ -847,7 +352,6 @@
           clearError(phone, phoneError);
         }
 
-        // Validate password
         const password = document.getElementById("pwd");
         const passwordError = document.getElementById("password-error");
         if (!password.value) {
@@ -863,8 +367,6 @@
         } else {
           clearError(password, passwordError);
         }
-
-        // Validate confirm password
         const confirmPassword = document.getElementById("pwd2");
         const confirmPasswordError = document.getElementById(
           "confirm-password-error"
@@ -887,12 +389,10 @@
           clearError(confirmPassword, confirmPasswordError);
         }
 
-        // prevent submission if validation fails
         if (!isValid) {
           e.preventDefault();
         }
       });
-      // helper functions
       function showError(input, errorElement, message) {
         input.classList.add("error");
         errorElement.textContent = message;
@@ -904,11 +404,9 @@
         errorElement.classList.add("hidden");
       }
 
-      // Real-time validation for better UX
       const inputs = document.querySelectorAll(".input");
       inputs.forEach((input) => {
         input.addEventListener("blur", function () {
-          // Trigger validation when user leaves the field
           const event = new Event("submit", { cancelable: true });
           form.dispatchEvent(event);
         });
