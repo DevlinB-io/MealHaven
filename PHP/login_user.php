@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (password_verify($password, $user['PASSWORD'])) {
             session_start();
             $_SESSION['user_id'] = $user['USER_ID'];
-            header("Location: ../HTML/main_website.html");
+            header("Location: ../HTML/login.html");
             exit();
         } else {
             showErrorPage("Invalid password. Please try again.");

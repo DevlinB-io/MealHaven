@@ -25,6 +25,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($checkEmail->num_rows() > 0) {
         showErrorPage("This email is already registered. Please log in instead.");
     }
+    
+        $checkPhone = $database_connection->prepare("SELECT USER_PHONE_NUMBER FROM USER WHERE USER_PHONE_NUMBER = ?");
+        $checkPhone->bind_param("s", $phone);
+        $checkPhone->execute();
+        $checkPhone->store_result();
+
+        if ($checkPhone->num_rows() > 0) {
+           showErrorPage('This phone number is already registered.');
+        }
+   
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -133,7 +143,7 @@ function showErrorPage($message)
         </div>
         <h1>Registration Failed</h1>
         <p>' . htmlspecialchars($message) . '</p>
-        <a href="../HTML/main_website.html" class="btn">Back to Sign Up</a>
+        <a href="../HTML/register.html" class="btn">Back to Sign Up</a>
     </div>
 </body>
 </html>';
