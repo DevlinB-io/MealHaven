@@ -27,7 +27,6 @@ require_once "../DATABASE/database_table_scrips.php";
     <div class="loading-text">Loading<span class="dots"></span></div>
   </div>
 
-  <!-- JavaScript must be linked at the end of the body -->
   <script src="../JAVASCRIPT/index.js"></script>
 </body>
 

@@ -2,7 +2,6 @@
 header('Content-Type: application/json');
 require_once '../DATABASE/database_connection.php';
 
-// Check connection
 if ($database_connection->connect_error) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed: ' . $database_connection->connect_error]);
@@ -10,7 +9,6 @@ if ($database_connection->connect_error) {
 }
 
 try {
-    // Get ingredients from database
     $result = $database_connection->query("
         SELECT 
             INGREDIENT_ID as id,

@@ -1,47 +1,25 @@
 <?php
-// connect to database
 require_once '../DATABASE/database_connection.php';
 
-// check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    // get email and password
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // check both fields filled
     if (empty($email) || empty($password)) {
         showErrorPage("Both email and password are required.");
     }
 
-    // find user by email
     $stmt = $database_connection->prepare("SELECT USER_ID, PASSWORD FROM USER WHERE USER_EMAIL_ADDRESS = ?");
-
-    // bind email
     $stmt->bind_param("s", $email);
-
-    // run query
     $stmt->execute();
-
-    // get results
     $result = $stmt->get_result();
 
-    // check if user found
     if ($result->num_rows === 1) {
-
-        // get user data
         $user = $result->fetch_assoc();
-
-        // check password matches
+       
         if (password_verify($password, $user['PASSWORD'])) {
-
-            // start session
             session_start();
-
-            // store user id
             $_SESSION['user_id'] = $user['USER_ID'];
-
-            // go to homepage
             header("Location: ../HTML/main_website.html");
             exit();
         } else {
@@ -51,14 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         showErrorPage("No account found with that email address.");
     }
 
-    // close statement and connection
     $stmt->close();
     $database_connection->close();
 }
 
 function showErrorPage($message)
 {
-    // Login failure card
     echo  '<!DOCTYPE html>
 <html lang="en">
 <head>

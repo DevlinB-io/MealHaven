@@ -1,18 +1,12 @@
 <?php
-
-// connect to database
 require_once '../DATABASE/database_connection.php';
 
-// check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // get form data
     $token = trim($_POST['token']);
     $new_password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
 
-    // check all fields filled
-    // check all fields filled
     if (empty($token) || empty($new_password) || empty($confirm_password)) {
         echo '<!DOCTYPE html>
     <html lang="en">
@@ -100,7 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // check passwords match
     if ($new_password !== $confirm_password) {
         echo '<!DOCTYPE html>
     <html lang="en">
@@ -188,24 +181,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-
-    // find reset token
     $stmt = $database_connection->prepare("SELECT user_email, expires_at FROM password_reset WHERE token = ?");
-    // bind token
     $stmt->bind_param("s", $token);
-    // run query
     $stmt->execute();
-    // get results
     $result = $stmt->get_result();
-
-    // check if token exists
+    
     if ($result->num_rows === 1) {
-        // get token data
         $row = $result->fetch_assoc();
         $email = $row['user_email'];
         $expires = $row['expires_at'];
 
-        // check if token link expired
         if (strtotime($expires) < time()) {
             echo '<!DOCTYPE html>
     <html lang="en">
@@ -293,18 +278,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
 
-        // hash new password
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-
-        // update user password
         $update = $database_connection->prepare("UPDATE USER SET PASSWORD = ? WHERE USER_EMAIL_ADDRESS = ?");
-        // bind password and email
         $update->bind_param("ss", $hashed_password, $email);
 
-        // save new password
         if ($update->execute()) {
-
-            // Password Reset Successful
             echo '<!DOCTYPE html>
         <html lang="en">
         <head>
@@ -476,17 +454,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
 
-
-        // delete used token
         $delete = $database_connection->prepare("DELETE FROM password_reset WHERE token = ?");
-        // bind token
         $delete->bind_param("s", $token);
-        // remove token
         $delete->execute();
-
-        // close statements
         $update->close();
         $delete->close();
+
     } else {
         echo '<!DOCTYPE html>
     <html lang="en">
@@ -573,8 +546,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </html>';
         exit();
     }
-
-    // close statement and connection
     $stmt->close();
     $database_connection->close();
 }

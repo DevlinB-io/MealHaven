@@ -4,7 +4,6 @@ header('Content-Type: application/json');
 
 require_once '../DATABASE/database_connection.php';
 
-// Check if admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     echo json_encode(['success' => false, 'error' => 'Unauthorized access']);
     exit;
@@ -20,10 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     try {
-        // Start transaction
         $database_connection->begin_transaction();
 
-        // Check if user exists and is not an admin
         $check_stmt = $database_connection->prepare("SELECT USER_ROLE FROM USER WHERE USER_ID = ?");
         $check_stmt->bind_param("i", $user_id);
         $check_stmt->execute();
@@ -36,10 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($user['USER_ROLE'] === 'ADMIN') {
             throw new Exception("Cannot delete admin users");
         }
-
-        // Delete user's data from related tables
-        // Note: This assumes ON DELETE CASCADE is set up in the database
-        // If not, you'll need to delete from each table manually
 
         $delete_stmt = $database_connection->prepare("DELETE FROM USER WHERE USER_ID = ?");
         $delete_stmt->bind_param("i", $user_id);

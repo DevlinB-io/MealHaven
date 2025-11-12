@@ -1,11 +1,8 @@
 <?php
-// get_recipes.php
 header('Content-Type: application/json');
 
-// Use your existing MySQLi database connection
 require_once '../DATABASE/database_connection.php';
 
-// Check connection
 if ($database_connection->connect_error) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed: ' . $database_connection->connect_error]);
@@ -13,7 +10,6 @@ if ($database_connection->connect_error) {
 }
 
 try {
-    // Get recipes from database using MySQLi
     $result = $database_connection->query("
         SELECT 
             RECIPE_ID as id,
@@ -42,7 +38,6 @@ try {
         $recipes[] = $row;
     }
     
-    // Return empty array if no recipes found
     if (empty($recipes)) {
         echo json_encode([]);
         exit;
@@ -55,6 +50,5 @@ try {
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }
 
-// Close connection
 $database_connection->close();
 ?>

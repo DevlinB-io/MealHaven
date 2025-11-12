@@ -1,11 +1,7 @@
 <?php
-
-// connect to database
 require_once '../DATABASE/database_connection.php';
 
-// check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // get form data
     $first_name = trim($_POST['first_name']);
     $last_name = trim($_POST['last_name']);
     $email = trim($_POST['email']);
@@ -13,73 +9,51 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
 
-    // check all fields filled
     if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
         showErrorPage("All required fields must be filled out.");
     }
 
-    // check passwords match
     if ($password !== $confirm_password) {
         showErrorPage("Passwords do not match.");
     }
 
-    // check if email already exists
     $checkEmail = $database_connection->prepare("SELECT USER_EMAIL_ADDRESS FROM USER WHERE USER_EMAIL_ADDRESS = ?");
-
-    // bind email
     $checkEmail->bind_param("s", $email);
-
-    // run query
     $checkEmail->execute();
-
-    // store results
     $checkEmail->store_result();
 
-    // check if email found
     if ($checkEmail->num_rows() > 0) {
         showErrorPage("This email is already registered. Please log in instead.");
     }
 
-    // hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // prepare insert query
     $stmt = $database_connection->prepare("
     INSERT INTO USER
     (USER_FIRST_NAME, USER_LAST_NAME, USER_EMAIL_ADDRESS, USER_PHONE_NUMBER, PASSWORD)
     VALUES (?, ?, ?, ?, ?)");
 
-    // bind all values
     $stmt->bind_param("sssss", $first_name, $last_name, $email, $phone, $hashed_password);
 
-    // save user to database
     if ($stmt->execute()) {
-        // start session
         session_start();
 
-        // get new user id
         $newUserId = $database_connection->insert_id;
 
-        // store user id in session
         $_SESSION['user_id'] = $newUserId;
 
-        // show success message and redirect
         showSuccessPage("Account created successfully! Redirecting to your dashboard...");
     } else {
-        // show error
         showErrorPage("Error creating account: " . $stmt->error);
     }
-    // close statements
     $stmt->close();
     $checkEmail->close();
 
-    // close connection
     $database_connection->close();
 }
 
 function showErrorPage($message)
 {
-    // Rgistration failure card
     echo '<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -168,7 +142,6 @@ function showErrorPage($message)
 
 function showSuccessPage($message)
 {
-    // Registration success card
     echo '<!DOCTYPE html>
 <html lang="en">
 <head>

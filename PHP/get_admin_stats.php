@@ -4,19 +4,16 @@ header('Content-Type: application/json');
 
 require_once '../DATABASE/database_connection.php';
 
-// Check if admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     echo json_encode(['success' => false, 'error' => 'Unauthorized access']);
     exit;
 }
 
 try {
-    // Get total users (non-admin)
     $totalUsers = $database_connection->query("
         SELECT COUNT(*) as count FROM USER WHERE USER_ROLE = 'USER'
     ")->fetch_assoc()['count'];
 
-    // Get active users (users with activity in last 30 days)
     $activeUsers = $database_connection->query("
         SELECT COUNT(DISTINCT USER_ID) as count 
         FROM (
@@ -26,12 +23,10 @@ try {
         ) as active_users
     ")->fetch_assoc()['count'];
 
-    // Get total recipes
     $totalRecipes = $database_connection->query("
         SELECT COUNT(*) as count FROM RECIPE
     ")->fetch_assoc()['count'];
 
-    // Get recent users (last 7 days)
     $recentUsers = $database_connection->query("
         SELECT COUNT(*) as count FROM USER 
         WHERE USER_ROLE = 'USER' 

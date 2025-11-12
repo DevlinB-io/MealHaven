@@ -1,11 +1,7 @@
 <?php
-
-// connect to database
 require_once '../DATABASE/database_connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    // get form data
     $name = trim($_POST['name']);
     $description = trim($_POST['description'] ?? '');
     $instructions = trim($_POST['instructions']);
@@ -18,12 +14,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $ingredients = trim($_POST['ingredients'] ?? '');
     $user_id = $_POST['user_id'] ?? null; // optional if logged in
 
-    // validate required fields
     if (!$name || !$instructions || !$ingredients) {
         showErrorPage("Please fill in name, ingredients, and instructions.");
     }
 
-    // handle image upload
     $imagePath = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
@@ -36,7 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    // prepare insert query
     $stmt = $database_connection->prepare("
         INSERT INTO RECIPE
         (RECIPE_NAME, RECIPE_DESCRIPTION, RECIPE_INSTRUCTIONS, RECIPE_DIFFICULTY_LEVEL, RECIPE_PREP_TIME_MINUTES, RECIPE_COOKING_TIME_MINUTES, CALORIES, SERVING_SIZE, RECIPE_IMAGE, CATEGORY, INGREDIENTS, USER_ID)
@@ -69,9 +62,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $database_connection->close();
 }
 
-// ----------------------
-// HTML templates
-// ----------------------
 function showErrorPage($message)
 {
     echo "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Error</title></head><body><h1>Error</h1><p>" . htmlspecialchars($message) . "</p><a href='../HTML/main_website.html'>Back</a></body></html>";

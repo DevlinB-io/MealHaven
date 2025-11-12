@@ -15,7 +15,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     try {
-        // Check if user exists and is an admin
         $stmt = $database_connection->prepare("
             SELECT USER_ID, USER_FIRST_NAME, USER_LAST_NAME, PASSWORD, USER_ROLE 
             FROM USER 
@@ -32,7 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $user = $result->fetch_assoc();
 
-        // Verify password (assuming passwords are hashed)
         if (password_verify($password, $user['PASSWORD'])) {
             $_SESSION['admin_logged_in'] = true;
             $_SESSION['admin_user_id'] = $user['USER_ID'];

@@ -1,15 +1,10 @@
 <?php
-// connect to database
 require_once '../DATABASE/database_connection.php';
 
-// check if form submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // get email from form
     $email = trim($_POST['email']);
 
-    // Email required
-    // check email not empty
     if (empty($email)) {
         echo '<!DOCTYPE html>
     <html lang="en">
@@ -97,42 +92,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // find user by email and get first name
     $stmt = $database_connection->prepare("SELECT USER_ID, USER_FIRST_NAME FROM USER WHERE USER_EMAIL_ADDRESS = ?");
-    // bind email
     $stmt->bind_param("s", $email);
-
-    // run query
     $stmt->execute();
-    // get results
     $result = $stmt->get_result();
 
-    // check if user exists
     if ($result->num_rows === 1) {
-        // get user data
         $user = $result->fetch_assoc();
         $firstName = $user['USER_FIRST_NAME'];
-
-        // create random token
         $token = bin2hex(random_bytes(32));
-
-        // set expiry time
         $expires = date("Y-m-d H:i:s", strtotime('+1 hour'));
-
-        // save token to database
         $saveToken = $database_connection->prepare("INSERT INTO password_reset (user_email, token, expires_at) VALUES (?, ?, ?)");
-        // bind values
         $saveToken->bind_param("sss", $email, $token, $expires);
-        // save token
         $saveToken->execute();
 
-        // build reset link
         $reset_link = "http://localhost/MealHaven/HTML/reset_password.html?token=" . $token;
 
-
-        // email subject
         $subject = "MealHaven Password Reset Request";
-        // email body
         $message = "
         <html>
         <head>
@@ -215,14 +191,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </body>
         </html>
         ";
-        // set email headers
+
         $headers = "From: MealHaven <no-reply@mealhaven.com>\r\n";
         $headers .= "Reply-To: no-reply@mealhaven.com\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $headers .= "Content-Transfer-Encoding: 8bit\r\n";
 
-        // sent email card
         if (mail($email, $subject, $message, $headers)) {
             echo '<!DOCTYPE html>
     <html lang="en">
@@ -293,7 +268,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </html>';
             exit();
         } else {
-            // email failed card
+
             echo '<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -363,10 +338,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit();
         }
 
-        // close statement
         $saveToken->close();
     } else {
-        // user not found card
         echo '<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -436,8 +409,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </html>';
         exit();
     }
-
-    // close statement and connection
     $stmt->close();
     $database_connection->close();
 }

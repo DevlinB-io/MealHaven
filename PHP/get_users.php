@@ -11,7 +11,6 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
 }
 
 try {
-    // Get all regular users (not admins) with their recipe counts
     $stmt = $database_connection->prepare("
         SELECT 
             u.USER_ID,

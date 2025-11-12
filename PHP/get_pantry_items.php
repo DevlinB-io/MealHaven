@@ -2,7 +2,6 @@
 header('Content-Type: application/json');
 require_once '../DATABASE/database_connection.php';
 
-// Check connection
 if ($database_connection->connect_error) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed: ' . $database_connection->connect_error]);
@@ -12,7 +11,6 @@ if ($database_connection->connect_error) {
 try {
     $user_id = $_GET['user_id'] ?? 1;
     
-    // Corrected query without inline comments
     $stmt = $database_connection->prepare("
         SELECT 
             p.PANTRY_ID as id,
