@@ -353,7 +353,8 @@
 
     <!-- DIALOGS -->
     <!-- PANTRY ADD ITEM DIALOG -->
-   <dialog id="pantryDialog" class="modal">
+ <!-- Updated Pantry Add Item Dialog -->
+<dialog id="pantryDialog" class="modal">
   <form id="pantryForm" class="modal-body" method="POST">
     <h3>Add Pantry Item</h3>
 
@@ -363,14 +364,9 @@
         <select id="ingredientSelect" name="ingredient_id" required>
           <option value="">Select an ingredient...</option>
         </select>
-        <button type="button" id="newIngredientBtn" class="btn link" style="margin-top: 5px">
+        <button type="button" id="newIngredientBtn" class="link-btn" style="margin-top: 5px">
           + Add New Ingredient
         </button>
-      </label>
-
-      <label>
-        Ingredient Name
-        <input type="text" id="ingredientNameInput" name="ingredient_name" required readonly />
       </label>
 
       <label>
@@ -399,13 +395,12 @@
       </label>
     </div>
 
-    <div class="form-buttons">
-      <button type="submit" class="btn btn-primary">Save</button>
-      <button type="button" id="pantryCancelBtn" class="btn btn-secondary">Cancel</button>
+    <div class="modal-actions">
+      <button type="button" id="pantryCancelBtn" class="btn">Cancel</button>
+      <button type="submit" class="btn primary">Save</button>
     </div>
   </form>
 </dialog>
-
     <!-- Recipe Create Modal -->
     <dialog id="recipeDialog" class="modal">
       <form

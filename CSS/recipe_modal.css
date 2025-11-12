@@ -1,60 +1,50 @@
 /* ==========================
-   Recipe Create Form Styling
+   Ingredient Create Form Styling
 ========================== */
 
-#recipeDialog::backdrop {
+#ingredientDialog::backdrop {
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(6px);
 }
 
-#recipeDialog {
+#ingredientDialog {
   border: none;
   border-radius: 20px;
   padding: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
   width: 750px;
   max-width: 90%;
   transition: all 0.3s ease;
+  border: 1px solid #d0d0d0;
 }
 
-#recipeDialog[open] {
+#ingredientDialog[open] {
   animation: popIn 0.3s ease;
 }
 
-@keyframes popIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-#recipeDialog .modal-body {
+#ingredientDialog .modal-body {
   padding: 2rem;
   font-family: "Inter", sans-serif;
   color: #222;
 }
 
-#recipeDialog h3 {
+#ingredientDialog h3 {
   font-size: 1.6rem;
   font-weight: 600;
-  color: #2e7d32; /* your signature green tone */
+  color: #2e7d32;
   margin-bottom: 1rem;
   text-align: center;
 }
 
-#recipeDialog .form-grid {
+#ingredientDialog .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.2rem 1.5rem;
 }
 
-#recipeDialog label {
+#ingredientDialog label {
   display: flex;
   flex-direction: column;
   font-weight: 500;
@@ -62,9 +52,8 @@
   color: #333;
 }
 
-#recipeDialog input,
-#recipeDialog select,
-#recipeDialog textarea {
+#ingredientDialog input,
+#ingredientDialog select {
   margin-top: 6px;
   padding: 10px 12px;
   border: 1px solid #d0d0d0;
@@ -74,23 +63,22 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#recipeDialog input:focus,
-#recipeDialog select:focus,
-#recipeDialog textarea:focus {
-  border-color: #43a047; /* consistent green */
+#ingredientDialog input:focus,
+#ingredientDialog select:focus {
+  border-color: #43a047;
   box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.25);
   outline: none;
 }
 
 /* ======= Buttons ======= */
-#recipeDialog .modal-actions {
+#ingredientDialog .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 2rem;
 }
 
-#recipeDialog .btn {
+#ingredientDialog .btn {
   padding: 10px 20px;
   border-radius: 10px;
   border: none;
@@ -99,28 +87,29 @@
   transition: background-color 0.25s, transform 0.2s;
 }
 
-#recipeDialog .btn.primary {
+#ingredientDialog .btn.primary {
   background: linear-gradient(135deg, #66bb6a, #43a047);
   color: #fff;
 }
 
-#recipeDialog .btn.primary:hover {
+#ingredientDialog .btn.primary:hover {
   background: linear-gradient(135deg, #57a65e, #388e3c);
   transform: translateY(-2px);
 }
 
-#recipeDialog .btn {
+#ingredientDialog .btn {
   background: #f2f2f2;
   color: #333;
+  border: 1px solid #d0d0d0;
 }
 
-#recipeDialog .btn:hover {
+#ingredientDialog .btn:hover {
   background: #e0e0e0;
 }
 
 /* Responsive */
 @media (max-width: 700px) {
-  #recipeDialog .form-grid {
+  #ingredientDialog .form-grid {
     grid-template-columns: 1fr;
   }
 }
