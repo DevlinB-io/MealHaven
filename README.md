@@ -198,5 +198,5 @@ http://localhost/MealHaven/PHP/index.php
 | Contributor | GitHub | Contribution |
 |-------------|--------|--------------|
 | Devlin B. | [@DevlinB-io](https://github.com/DevlinB-io) | Frontend & backend authentication (register, login, forgot password, reset password, session management), MySQL database |
-| *(teammate)* | *(add GitHub link)* | *(add contribution)* |
-| *(teammate)* | *(add GitHub link)* | *(add contribution)* |
+| CodingPhishKeys | [@CodingPhishKeys](https://github.com/CodingPhishKeys) | Project management — project timeline, risk management, documentation, stakeholder liaison, change management |
+| Caleb595 | [@Caleb595](https://github.com/Caleb595) | Software development — backend APIs, frontend screens, barcode integration, database infrastructure, testing |
